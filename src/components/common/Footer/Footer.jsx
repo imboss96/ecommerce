@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Footer.css';
 
 const Footer = () => {
@@ -28,6 +29,14 @@ const Footer = () => {
             </ul>
           </div>
           <div>
+            <h3 className="text-lg font-bold mb-4">Legal</h3>
+            <ul className="text-gray-400 space-y-2">
+              <li><Link to="/terms" className="hover:text-white">Terms & Conditions</Link></li>
+              <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-white">Contact Us</a></li>
+            </ul>
+          </div>
+          <div>
             <h3 className="text-lg font-bold mb-4">Contact</h3>
             <p className="text-gray-400">Email: support@shopki.com</p>
             <p className="text-gray-400">Phone: +1-800-SHOPKI</p>
@@ -36,6 +45,7 @@ const Footer = () => {
         <hr className="border-gray-700 my-8" />
         <div className="text-center text-gray-400">
           <p>&copy; 2024 Shopki. All rights reserved.</p>
+          <p className="text-xs mt-2">Registered in Kenya | Data Protection Act Compliant</p>
         </div>
       </div>
     </footer>

@@ -21,6 +21,8 @@ const AdminDashboard = () => {
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
   const [orderUpdateMessage, setOrderUpdateMessage] = useState(null);
   const [orderSearchTerm, setOrderSearchTerm] = useState('');
+  const [orderStatusFilter, setOrderStatusFilter] = useState('all');
+  const [orderDateFilter, setOrderDateFilter] = useState('all');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -39,20 +41,52 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
-  // Filter orders based on search term
+  // Filter orders based on search term, status, and date
   useEffect(() => {
-    if (!orderSearchTerm.trim()) {
-      setFilteredOrders(orders);
-    } else {
+    let filtered = orders;
+
+    // Filter by search term
+    if (orderSearchTerm.trim()) {
       const searchLower = orderSearchTerm.toLowerCase();
-      const filtered = orders.filter(order => 
+      filtered = filtered.filter(order => 
         order.id.toLowerCase().includes(searchLower) ||
         (order.userName && order.userName.toLowerCase().includes(searchLower)) ||
         (order.userEmail && order.userEmail.toLowerCase().includes(searchLower))
       );
-      setFilteredOrders(filtered);
     }
-  }, [orders, orderSearchTerm]);
+
+    // Filter by status
+    if (orderStatusFilter !== 'all') {
+      filtered = filtered.filter(order => order.status === orderStatusFilter);
+    }
+
+    // Filter by date
+    if (orderDateFilter !== 'all') {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+      filtered = filtered.filter(order => {
+        const orderDate = order.createdAt 
+          ? new Date(order.createdAt)
+          : new Date(0);
+        
+        switch (orderDateFilter) {
+          case 'today':
+            return orderDate.toDateString() === today.toDateString();
+          case 'week':
+            return orderDate >= sevenDaysAgo && orderDate <= today;
+          case 'month':
+            return orderDate >= thirtyDaysAgo && orderDate <= today;
+          default:
+            return true;
+        }
+      });
+    }
+
+    setFilteredOrders(filtered);
+  }, [orders, orderSearchTerm, orderStatusFilter, orderDateFilter]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -842,29 +876,69 @@ const AdminDashboard = () => {
         {/* Orders Section */}
         {activeTab === 'orders' && (
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            {/* Search Bar */}
+            {/* Search and Filters */}
             <div className="p-6 border-b">
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block text-sm font-semibold mb-2">Search Orders</label>
-                  <input
-                    type="text"
-                    placeholder="Search by Order ID, Customer Name, or Email..."
-                    value={orderSearchTerm}
-                    onChange={(e) => setOrderSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500"
-                  />
-                </div>
-                {orderSearchTerm && (
-                  <button
-                    onClick={() => setOrderSearchTerm('')}
-                    className="self-end px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
-                  >
-                    Clear
-                  </button>
-                )}
+              {/* Search Bar */}
+              <div className="mb-4">
+                <label className="block text-sm font-semibold mb-2">Search Orders</label>
+                <input
+                  type="text"
+                  placeholder="Search by Order ID, Customer Name, or Email..."
+                  value={orderSearchTerm}
+                  onChange={(e) => setOrderSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500"
+                />
               </div>
-              <p className="text-sm text-gray-500 mt-2">
+
+              {/* Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Filter by Status</label>
+                  <select
+                    value={orderStatusFilter}
+                    onChange={(e) => setOrderStatusFilter(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="returned">Returned</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Filter by Date</label>
+                  <select
+                    value={orderDateFilter}
+                    onChange={(e) => setOrderDateFilter(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500"
+                  >
+                    <option value="all">All Dates</option>
+                    <option value="today">Today</option>
+                    <option value="week">Last 7 Days</option>
+                    <option value="month">Last 30 Days</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Clear Filters</label>
+                  <button
+                    onClick={() => {
+                      setOrderSearchTerm('');
+                      setOrderStatusFilter('all');
+                      setOrderDateFilter('all');
+                    }}
+                    className="w-full px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium"
+                  >
+                    Reset All Filters
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-500 mt-4">
                 Found {filteredOrders.length} order{filteredOrders.length !== 1 ? 's' : ''}
               </p>
             </div>

@@ -14,6 +14,7 @@ import ProfilePage from '../pages/ProfilePage';
 import OrdersPage from '../pages/OrdersPage';
 import WishlistPage from '../pages/WishlistPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import TermsAndConditionsPage from '../pages/TermsAndConditionsPage';
 
 // Admin Pages
 import SeedData from '../pages/admin/SeedData';
@@ -30,6 +31,7 @@ const AppRoutes = () => {
       <Route path="/product/:id" element={<ProductDetailsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/terms" element={<TermsAndConditionsPage />} />
       
       {/* Admin Routes - Add these */}
       <Route path="/seed-data" element={<SeedData />} />
