@@ -16,12 +16,14 @@ import {
 import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '../services/firebase/config';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import ProductCard from '../components/products/ProductCard/ProductCard';
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { addToCart } = useCart();
   
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -104,7 +106,10 @@ const ProductDetailsPage = () => {
       alert('Product is out of stock');
       return;
     }
-    // TODO: Implement add to cart
+    // Add the product to cart with the selected quantity
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product);
+    }
     alert(`Added ${quantity} ${product.name} to cart!`);
   };
 
