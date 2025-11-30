@@ -252,7 +252,7 @@ export const KENYA_COUNTIES = [
 ];
 
 // Export all as default
-export default {
+const constants = {
   APP_NAME,
   APP_DESCRIPTION,
   CURRENCY,
@@ -262,3 +262,5 @@ export default {
   CATEGORIES,
   CONTACT_INFO
 };
+
+export default constants;
