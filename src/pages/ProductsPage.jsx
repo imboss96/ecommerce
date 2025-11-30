@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { FiFilter, FiSearch, FiArrowRight } from 'react-icons/fi';
+import { useSearchParams } from 'react-router-dom';
 import { getProducts } from '../services/firebase/firestoreHelpers';
 import ProductCard from '../components/products/ProductCard/ProductCard';
 import Breadcrumb from '../components/common/Breadcrumb/Breadcrumb';
 import Loader from '../components/common/Loader/Spinner';
 
 export const ProductsPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
   const [sortBy, setSortBy] = useState('newest');
   const [categories, setCategories] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 100000]);
@@ -38,6 +40,14 @@ export const ProductsPage = () => {
 
     fetchProducts();
   }, []);
+
+  // Update URL params when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchTerm) params.set('search', searchTerm);
+    if (selectedCategory && selectedCategory !== 'all') params.set('category', selectedCategory);
+    setSearchParams(params);
+  }, [searchTerm, selectedCategory, setSearchParams]);
 
   // Filter and sort products
   useEffect(() => {
