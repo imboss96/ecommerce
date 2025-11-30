@@ -3,11 +3,14 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiHeart, FiShoppingCart, FiEye, FiStar } from 'react-icons/fi';
 import { useAuth } from '../../../context/AuthContext';
+import { useCart } from '../../../context/CartContext';
 
 const ProductCard = ({ product }) => {
   const { isAuthenticated } = useAuth();
+  const { addToCart } = useCart();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   // Calculate discount percentage
   const discountPercent = product.originalPrice && product.price
@@ -28,8 +31,17 @@ const ProductCard = ({ product }) => {
   // Handle add to cart
   const handleAddToCart = (e) => {
     e.preventDefault();
-    // TODO: Add to cart functionality
-    alert(`${product.name} added to cart!`);
+    if (product.stock <= 0) {
+      alert('Product is out of stock');
+      return;
+    }
+    
+    // Add product to cart
+    addToCart(product);
+    setAddedToCart(true);
+    
+    // Reset the added state after 2 seconds
+    setTimeout(() => setAddedToCart(false), 2000);
   };
 
   // Get first image or fallback
@@ -83,7 +95,11 @@ const ProductCard = ({ product }) => {
           {product.stock > 0 && (
             <button
               onClick={handleAddToCart}
-              className="bg-white text-gray-800 p-3 rounded-full hover:bg-orange-500 hover:text-white transition-all transform hover:scale-110"
+              className={`p-3 rounded-full transition-all transform hover:scale-110 ${
+                addedToCart
+                  ? 'bg-green-500 text-white'
+                  : 'bg-white text-gray-800 hover:bg-orange-500 hover:text-white'
+              }`}
               title="Add to Cart"
             >
               <FiShoppingCart />
