@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../services/firebase/config';
-import { FiEdit2, FiTrash2, FiX, FiUpload, FiShoppingCart, FiBarChart2 } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiX, FiUpload, FiShoppingCart, FiBarChart2, FiCheck } from 'react-icons/fi';
 import { CATEGORIES } from '../../utils/constants';
 import CategoryDropdown from '../../components/admin/CategoryDropdown';
 import FinanceAnalytics from '../../components/admin/FinanceAnalytics';
@@ -15,6 +15,8 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [filteredMembers, setFilteredMembers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -25,6 +27,9 @@ const AdminDashboard = () => {
   const [orderSearchTerm, setOrderSearchTerm] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
   const [orderDateFilter, setOrderDateFilter] = useState('all');
+  const [memberSearchTerm, setMemberSearchTerm] = useState('');
+  const [memberRoleFilter, setMemberRoleFilter] = useState('all');
+  const [updatingMemberId, setUpdatingMemberId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -42,6 +47,28 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Filter members based on search term and role
+  useEffect(() => {
+    let filtered = members;
+
+    // Filter by search term
+    if (memberSearchTerm.trim()) {
+      const searchLower = memberSearchTerm.toLowerCase();
+      filtered = filtered.filter(member => 
+        member.email?.toLowerCase().includes(searchLower) ||
+        member.displayName?.toLowerCase().includes(searchLower) ||
+        member.uid?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Filter by role
+    if (memberRoleFilter !== 'all') {
+      filtered = filtered.filter(member => (member.role || 'customer') === memberRoleFilter);
+    }
+
+    setFilteredMembers(filtered);
+  }, [members, memberSearchTerm, memberRoleFilter]);
 
   // Filter orders based on search term, status, and date
   useEffect(() => {
@@ -110,6 +137,24 @@ const AdminDashboard = () => {
         ...doc.data()
       }));
       setCategories(categoriesData);
+
+      // Fetch all members/users
+      const usersRef = collection(db, 'users');
+      const usersSnap = await getDocs(usersRef);
+      const usersData = usersSnap.docs.map(doc => ({
+        id: doc.id,
+        uid: doc.id,
+        ...doc.data()
+      }));
+      
+      // Sort members by creation date descending
+      usersData.sort((a, b) => {
+        const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt) || new Date(0);
+        const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt) || new Date(0);
+        return dateB - dateA;
+      });
+      
+      setMembers(usersData);
 
       // Fetch all orders
       const ordersRef = collection(db, 'orders');
@@ -259,6 +304,69 @@ const AdminDashboard = () => {
     setTimeout(() => setOrderUpdateMessage(null), 3000);
   };
 
+  const handleMemberRoleUpdate = async (memberId, newRole) => {
+    setUpdatingMemberId(memberId);
+    try {
+      const memberRef = doc(db, 'users', memberId);
+      await updateDoc(memberRef, {
+        role: newRole,
+        updatedAt: new Date().toISOString()
+      });
+      
+      setMembers(members.map(member =>
+        member.id === memberId ? { ...member, role: newRole } : member
+      ));
+      toast.success(`Member role updated to ${newRole}`);
+    } catch (error) {
+      toast.error('Error updating member role');
+      console.error('Error:', error);
+    } finally {
+      setUpdatingMemberId(null);
+    }
+  };
+
+  const handleDeleteMember = async (memberId, memberEmail) => {
+    if (!window.confirm(`Are you sure you want to delete "${memberEmail}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setUpdatingMemberId(memberId);
+    try {
+      await deleteDoc(doc(db, 'users', memberId));
+      setMembers(members.filter(m => m.id !== memberId));
+      toast.success('Member deleted successfully');
+    } catch (error) {
+      toast.error('Error deleting member');
+      console.error('Error:', error);
+    } finally {
+      setUpdatingMemberId(null);
+    }
+  };
+
+  const handleVerificationToggle = async (memberId, currentStatus) => {
+    setUpdatingMemberId(memberId);
+    try {
+      const memberRef = doc(db, 'users', memberId);
+      await updateDoc(memberRef, {
+        verified: !currentStatus,
+        verifiedAt: !currentStatus ? new Date().toISOString() : null,
+        updatedAt: new Date().toISOString()
+      });
+      
+      setMembers(members.map(member =>
+        member.id === memberId 
+          ? { ...member, verified: !currentStatus, verifiedAt: !currentStatus ? new Date().toISOString() : null } 
+          : member
+      ));
+      toast.success(`Member ${!currentStatus ? 'verified' : 'unverified'} successfully`);
+    } catch (error) {
+      toast.error('Error updating verification status');
+      console.error('Error:', error);
+    } finally {
+      setUpdatingMemberId(null);
+    }
+  };
+
   const handleDelete = async (productId, productName) => {
     if (!window.confirm(`Are you sure you want to delete "${productName}"? This action cannot be undone.`)) {
       return;
@@ -316,13 +424,13 @@ const AdminDashboard = () => {
 
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow-md mb-6 border-b">
-          <div className="flex">
+          <div className="flex overflow-x-auto">
             <button
               onClick={() => {
                 setActiveTab('products');
                 setShowForm(false);
               }}
-              className={`flex-1 py-4 px-6 font-semibold flex items-center justify-center gap-2 border-b-2 transition ${
+              className={`flex-1 py-4 px-6 font-semibold flex items-center justify-center gap-2 border-b-2 transition whitespace-nowrap ${
                 activeTab === 'products'
                   ? 'border-orange-500 text-orange-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
@@ -332,7 +440,7 @@ const AdminDashboard = () => {
             </button>
             <button
               onClick={() => setActiveTab('orders')}
-              className={`flex-1 py-4 px-6 font-semibold flex items-center justify-center gap-2 border-b-2 transition ${
+              className={`flex-1 py-4 px-6 font-semibold flex items-center justify-center gap-2 border-b-2 transition whitespace-nowrap ${
                 activeTab === 'orders'
                   ? 'border-orange-500 text-orange-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
@@ -341,8 +449,18 @@ const AdminDashboard = () => {
               <FiShoppingCart /> Orders
             </button>
             <button
+              onClick={() => setActiveTab('members')}
+              className={`flex-1 py-4 px-6 font-semibold flex items-center justify-center gap-2 border-b-2 transition whitespace-nowrap ${
+                activeTab === 'members'
+                  ? 'border-orange-500 text-orange-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              👥 Members
+            </button>
+            <button
               onClick={() => setActiveTab('finance')}
-              className={`flex-1 py-4 px-6 font-semibold flex items-center justify-center gap-2 border-b-2 transition ${
+              className={`flex-1 py-4 px-6 font-semibold flex items-center justify-center gap-2 border-b-2 transition whitespace-nowrap ${
                 activeTab === 'finance'
                   ? 'border-orange-500 text-orange-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
@@ -395,6 +513,25 @@ const AdminDashboard = () => {
               <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="text-gray-600 text-sm">Completed</div>
                 <div className="text-3xl font-bold text-green-500">{orders.filter(o => o.status === 'completed').length}</div>
+              </div>
+            </>
+          ) : activeTab === 'members' ? (
+            <>
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="text-gray-600 text-sm">Total Members</div>
+                <div className="text-3xl font-bold text-orange-500">{members.length}</div>
+              </div>
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="text-gray-600 text-sm">Customers</div>
+                <div className="text-3xl font-bold text-blue-500">{members.filter(m => !m.role || m.role === 'customer').length}</div>
+              </div>
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="text-gray-600 text-sm">Vendors</div>
+                <div className="text-3xl font-bold text-green-500">{members.filter(m => m.role === 'vendor').length}</div>
+              </div>
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="text-gray-600 text-sm">Admins</div>
+                <div className="text-3xl font-bold text-red-500">{members.filter(m => m.role === 'admin').length}</div>
               </div>
             </>
           ) : null}
@@ -986,6 +1123,190 @@ const AdminDashboard = () => {
         {/* Finance & Analytics Section */}
         {activeTab === 'finance' && (
           <FinanceAnalytics orders={orders} products={products} />
+        )}
+
+        {/* Members Section */}
+        {activeTab === 'members' && (
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            {/* Search and Filters */}
+            <div className="p-6 border-b">
+              {/* Search Bar */}
+              <div className="mb-4">
+                <label className="block text-sm font-semibold mb-2">Search Members</label>
+                <input
+                  type="text"
+                  placeholder="Search by Name, Email, or ID..."
+                  value={memberSearchTerm}
+                  onChange={(e) => setMemberSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500"
+                />
+              </div>
+
+              {/* Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Filter by Role</label>
+                  <select
+                    value={memberRoleFilter}
+                    onChange={(e) => setMemberRoleFilter(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500"
+                  >
+                    <option value="all">All Roles</option>
+                    <option value="customer">Customer</option>
+                    <option value="vendor">Vendor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+
+                <div></div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2">Clear Filters</label>
+                  <button
+                    onClick={() => {
+                      setMemberSearchTerm('');
+                      setMemberRoleFilter('all');
+                    }}
+                    className="w-full px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium"
+                  >
+                    Reset All Filters
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-500 mt-4">
+                Found {filteredMembers.length} member{filteredMembers.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+
+            {filteredMembers.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-100 border-b">
+                      <th className="text-left py-3 px-4">Member</th>
+                      <th className="text-left py-3 px-4">Email</th>
+                      <th className="text-left py-3 px-4">Role</th>
+                      <th className="text-left py-3 px-4">Status</th>
+                      <th className="text-left py-3 px-4">Joined Date</th>
+                      <th className="text-left py-3 px-4">Phone</th>
+                      <th className="text-center py-3 px-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredMembers.map((member) => (
+                      <tr key={member.id} className="border-b hover:bg-gray-50">
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-3">
+                            {member.photoURL ? (
+                              <img
+                                src={member.photoURL}
+                                alt={member.displayName}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-sm font-bold text-orange-600">
+                                {member.displayName?.charAt(0) || 'U'}
+                              </div>
+                            )}
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold">{member.displayName || 'Unknown'}</span>
+                                {member.verified && (
+                                  <div className="relative group">
+                                    <FiCheck className="w-4 h-4 text-blue-500 bg-white rounded-full border border-blue-500 flex items-center justify-center" />
+                                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-10">
+                                      Verified
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-500">{member.uid.slice(0, 8)}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-sm">{member.email || 'N/A'}</td>
+                        <td className="py-4 px-4">
+                          <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                            member.role === 'admin'
+                              ? 'bg-red-100 text-red-800'
+                              : member.role === 'vendor'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {(member.role || 'customer').charAt(0).toUpperCase() + (member.role || 'customer').slice(1)}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4">
+                          <button
+                            onClick={() => handleVerificationToggle(member.id, member.verified)}
+                            disabled={updatingMemberId === member.id}
+                            className={`px-3 py-1 rounded-full text-sm font-semibold transition ${
+                              member.verified
+                                ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                            } ${updatingMemberId === member.id ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
+                            title={member.verified ? 'Click to unverify' : 'Click to verify'}
+                          >
+                            {member.verified ? '✓ Verified' : '○ Unverified'}
+                          </button>
+                        </td>
+                        <td className="py-4 px-4 text-sm">
+                          {member.createdAt
+                            ? new Date(member.createdAt).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })
+                            : 'N/A'}
+                        </td>
+                        <td className="py-4 px-4 text-sm">{member.phone || 'N/A'}</td>
+                        <td className="py-4 px-4">
+                          <div className="flex flex-wrap gap-1 justify-center">
+                            {['customer', 'vendor', 'admin'].map((role) => (
+                              <button
+                                key={role}
+                                onClick={() => handleMemberRoleUpdate(member.id, role)}
+                                disabled={updatingMemberId === member.id || (member.role || 'customer') === role}
+                                className={`px-2 py-1 text-xs rounded font-medium transition ${
+                                  (member.role || 'customer') === role
+                                    ? 'bg-gray-300 text-gray-600 cursor-default'
+                                    : updatingMemberId === member.id
+                                    ? 'bg-gray-200 text-gray-500 cursor-wait'
+                                    : role === 'admin'
+                                    ? 'bg-red-500 hover:bg-red-600 text-white'
+                                    : role === 'vendor'
+                                    ? 'bg-green-500 hover:bg-green-600 text-white'
+                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                }`}
+                                title={`Change to ${role}`}
+                              >
+                                {role.slice(0, 3).toUpperCase()}
+                              </button>
+                            ))}
+                            <button
+                              onClick={() => handleDeleteMember(member.id, member.email)}
+                              disabled={updatingMemberId === member.id}
+                              className="px-2 py-1 text-xs rounded font-medium bg-red-600 hover:bg-red-700 text-white transition disabled:opacity-50"
+                              title="Delete Member"
+                            >
+                              <FiTrash2 />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-500">
+                  {memberSearchTerm ? 'No members found matching your search' : 'No members yet'}
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

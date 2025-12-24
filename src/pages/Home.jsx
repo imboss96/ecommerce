@@ -7,11 +7,13 @@ import {
   FiHeart
 } from 'react-icons/fi';
 import { getProducts, getCategories } from '../services/firebase/firestoreHelpers';
+import { subscribeToNewsletter, sendNewsletterWelcomeEmail } from '../services/email/brevoService';
 import ProductCard from '../components/products/ProductCard/ProductCard';
 import SkeletonCard from '../components/common/Loader/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import AuthModal from '../components/auth/AuthModal.jsx';
+import { toast } from 'react-toastify';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -27,6 +29,8 @@ const Home = () => {
   const [error, setError] = useState(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalView, setAuthModalView] = useState('login');
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
 
   // Fetch all data on component mount
   useEffect(() => {
