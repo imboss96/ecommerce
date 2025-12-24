@@ -13,6 +13,8 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 // Import the already initialized Firebase instances
 import { auth, db } from '../services/firebase/config';
+// Import email automation
+import { sendAccountConfirmationEmail } from '../services/email/emailAutomation';
 
 const AuthContext = createContext();
 
@@ -83,7 +85,28 @@ export const AuthProvider = ({ children }) => {
         displayName: displayName,
         createdAt: new Date().toISOString(),
         photoURL: user.photoURL || null,
-        isAdmin: false, // Default to false, set to true for admin users
+        isAdmin: false,
+        verified: false,
+        role: 'customer',
+        preferences: {
+          emailNotifications: true,
+          pushNotifications: true,
+          smsNotifications: false,
+          newsletter: true,
+          productUpdates: true,
+          promotionalEmails: true,
+          orderUpdates: true,
+          theme: 'light',
+          language: 'en',
+          currency: 'KES',
+          privateProfile: false,
+          showOnlineStatus: true,
+          allowPersonalization: true,
+          saveCartItems: true,
+          rememberPaymentMethod: false,
+          showRecommendations: true,
+          frequency: 'weekly'
+        },
         cart: [],
         orders: [],
         wishlist: []
@@ -91,6 +114,15 @@ export const AuthProvider = ({ children }) => {
 
       await setDoc(userDocRef, userData);
       setUserData(userData);
+
+      // Send account confirmation email
+      try {
+        await sendAccountConfirmationEmail(email, displayName);
+        console.log('✅ Welcome email sent to:', email);
+      } catch (emailError) {
+        console.error('⚠️ Email service error (account still created):', emailError);
+        // Don't fail signup if email fails
+      }
 
       return { success: true, user };
     } catch (error) {
@@ -130,13 +162,42 @@ export const AuthProvider = ({ children }) => {
           displayName: user.displayName,
           createdAt: new Date().toISOString(),
           photoURL: user.photoURL,
-          isAdmin: false, // Default to false, set to true for admin users
+          isAdmin: false,
+          verified: false,
+          role: 'customer',
+          preferences: {
+            emailNotifications: true,
+            pushNotifications: true,
+            smsNotifications: false,
+            newsletter: true,
+            productUpdates: true,
+            promotionalEmails: true,
+            orderUpdates: true,
+            theme: 'light',
+            language: 'en',
+            currency: 'KES',
+            privateProfile: false,
+            showOnlineStatus: true,
+            allowPersonalization: true,
+            saveCartItems: true,
+            rememberPaymentMethod: false,
+            showRecommendations: true,
+            frequency: 'weekly'
+          },
           cart: [],
           orders: [],
           wishlist: []
         };
         await setDoc(userDocRef, userData);
         setUserData(userData);
+
+        // Send welcome email
+        try {
+          await sendAccountConfirmationEmail(user.email, user.displayName || 'User');
+          console.log('✅ Welcome email sent to:', user.email);
+        } catch (emailError) {
+          console.error('⚠️ Email service error:', emailError);
+        }
       } else {
         await fetchUserData(user.uid);
       }

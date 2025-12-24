@@ -6,7 +6,7 @@ import { FiCreditCard, FiPhone } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { createOrder, updateOrderStatus } from '../services/firebase/firestoreHelpers';
-import { sendOrderConfirmationEmail } from '../services/firebase/emailService';
+import { sendOrderConfirmation } from '../services/email/emailAutomation';
 import { initiateMpesaPayment, formatPhoneNumber, validateMpesaPaymentData } from '../services/payment/mpesaService';
 import { toast } from 'react-toastify';
 import Breadcrumb from '../components/common/Breadcrumb/Breadcrumb';
@@ -175,14 +175,14 @@ const CheckoutPage = () => {
       }
 
       // For COD and Card, send confirmation email
-      await sendOrderConfirmationEmail(
-        user.email,
-        user.displayName || 'Valued Customer',
-        orderId,
-        cartItems,
-        total,
-        shippingInfo
-      );
+      const emailOrderData = {
+        id: orderId,
+        items: cartItems,
+        total: total,
+        createdAt: new Date().toISOString()
+      };
+      
+      await sendOrderConfirmation(user.email, emailOrderData);
 
       // Clear cart
       await clearCart();

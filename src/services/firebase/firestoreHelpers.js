@@ -15,7 +15,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { db } from './config';
-import { sendOrderStatusEmail } from './emailService';
+import { sendOrderStatusUpdate } from '../email/emailAutomation';
 
 /**
  * Get all products or limited number
@@ -415,15 +415,13 @@ export const updateOrderStatus = async (orderId, status) => {
     
     // Send email notification to user
     if (orderData.userEmail) {
-      console.log(`📧 Sending email to ${orderData.userEmail}...`);
-      const emailResult = await sendOrderStatusEmail(
-        orderData.userEmail,
-        orderData.userName || 'Customer',
-        orderId,
-        status,
-        orderData.items || [],
-        orderData.total || 0
-      );
+      console.log(`📧 Sending status update email to ${orderData.userEmail}...`);
+      const orderInfo = {
+        id: orderId,
+        status: status,
+        trackingNumber: orderData.trackingNumber || null
+      };
+      const emailResult = await sendOrderStatusUpdate(orderData.userEmail, orderInfo);
       console.log('📧 Email result:', emailResult);
     } else {
       console.warn('⚠️ No email found for order:', orderId);

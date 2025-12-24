@@ -7,6 +7,7 @@ import { CATEGORIES } from '../../utils/constants';
 import CategoryDropdown from '../../components/admin/CategoryDropdown';
 import FinanceAnalytics from '../../components/admin/FinanceAnalytics';
 import ProductImageUpload from '../../components/admin/Products/ProductImageUpload';
+import AdminSettings from '../../components/admin/AdminSettings/AdminSettings';
 import { updateOrderStatus } from '../../services/firebase/firestoreHelpers';
 import { toast } from 'react-toastify';
 
@@ -310,11 +311,12 @@ const AdminDashboard = () => {
       const memberRef = doc(db, 'users', memberId);
       await updateDoc(memberRef, {
         role: newRole,
+        isAdmin: newRole === 'admin' ? true : false,
         updatedAt: new Date().toISOString()
       });
       
       setMembers(members.map(member =>
-        member.id === memberId ? { ...member, role: newRole } : member
+        member.id === memberId ? { ...member, role: newRole, isAdmin: newRole === 'admin' ? true : false } : member
       ));
       toast.success(`Member role updated to ${newRole}`);
     } catch (error) {
@@ -467,6 +469,16 @@ const AdminDashboard = () => {
               }`}
             >
               <FiBarChart2 /> Finance & Analytics
+            </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`flex-1 py-4 px-6 font-semibold flex items-center justify-center gap-2 border-b-2 transition whitespace-nowrap ${
+                activeTab === 'settings'
+                  ? 'border-orange-500 text-orange-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              ⚙️ Settings
             </button>
           </div>
         </div>
@@ -1123,6 +1135,11 @@ const AdminDashboard = () => {
         {/* Finance & Analytics Section */}
         {activeTab === 'finance' && (
           <FinanceAnalytics orders={orders} products={products} />
+        )}
+
+        {/* Settings Section */}
+        {activeTab === 'settings' && (
+          <AdminSettings />
         )}
 
         {/* Members Section */}

@@ -1,7 +1,7 @@
 // src/components/user/Profile/PasswordChange.jsx
 
 import React, { useState } from 'react';
-import { FiLock, FiEye, FiEyeOff, FiCheck, FiX } from 'react-icons/fi';
+import { FiLock, FiEye, FiEyeOff, FiCheck, FiX, FiAlertTriangle } from 'react-icons/fi';
 import { useAuth } from '../../../context/AuthContext';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from '../../../services/firebase/config';
@@ -21,6 +21,10 @@ const PasswordChange = () => {
   });
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+
+  // Check if user signed in with email/password or social login
+  const isEmailUser = user?.providerData?.some(provider => provider.providerId === 'password');
+  const socialProviders = user?.providerData?.filter(provider => provider.providerId !== 'password') || [];
 
   const calculatePasswordStrength = (password) => {
     let strength = 0;
@@ -136,7 +140,92 @@ const PasswordChange = () => {
           Change Password
         </h2>
 
-        <form onSubmit={handleChangePassword} className="space-y-4">
+        {!isEmailUser ? (
+          // Social Login Users
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
+            <div className="flex items-start gap-4">
+              <FiAlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="font-semibold text-amber-900 mb-2">Password Change Not Available</h3>
+                <p className="text-amber-800 mb-4">
+                  You're using {socialProviders.length > 0 && (
+                    <span className="font-medium">
+                      {socialProviders.map(p => 
+                        p.providerId === 'google.com' ? 'Google' :
+                        p.providerId === 'facebook.com' ? 'Facebook' :
+                        p.providerId === 'github.com' ? 'GitHub' :
+                        p.providerId === 'apple.com' ? 'Apple' :
+                        p.providerId.charAt(0).toUpperCase() + p.providerId.slice(1)
+                      ).join(', ')}
+                    </span>
+                  )} to sign in to your account. Password management is handled by your social login provider.
+                </p>
+                
+                <div className="bg-white rounded-lg p-4 space-y-3">
+                  <p className="text-sm text-amber-800 font-medium">To change your password:</p>
+                  <ol className="text-sm text-amber-800 space-y-2 list-decimal list-inside">
+                    <li>Visit your {socialProviders.length > 0 && socialProviders[0].providerId === 'google.com' ? 'Google Account' : 'social provider'} settings</li>
+                    <li>Update your password there</li>
+                    <li>The changes will apply to all services using that account</li>
+                  </ol>
+                </div>
+
+                {socialProviders.length > 0 && (
+                  <div className="mt-4 flex gap-3">
+                    {socialProviders.map(provider => {
+                      const getProviderUrl = (providerId) => {
+                        switch(providerId) {
+                          case 'google.com':
+                            return 'https://myaccount.google.com/security';
+                          case 'facebook.com':
+                            return 'https://www.facebook.com/settings/security';
+                          case 'github.com':
+                            return 'https://github.com/settings/security';
+                          case 'apple.com':
+                            return 'https://appleid.apple.com/account/manage';
+                          default:
+                            return '#';
+                        }
+                      };
+                      
+                      const getProviderName = (providerId) => {
+                        switch(providerId) {
+                          case 'google.com':
+                            return 'Google Account Security';
+                          case 'facebook.com':
+                            return 'Facebook Settings';
+                          case 'github.com':
+                            return 'GitHub Security';
+                          case 'apple.com':
+                            return 'Apple ID Management';
+                          default:
+                            return 'Provider Settings';
+                        }
+                      };
+
+                      return (
+                        <a
+                          key={provider.providerId}
+                          href={getProviderUrl(provider.providerId)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-sm"
+                        >
+                          <span>Go to {getProviderName(provider.providerId)}</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Email/Password Users
+          <form onSubmit={handleChangePassword} className="space-y-4">
           {/* Current Password */}
           <div>
             <label className="text-gray-700 font-semibold block mb-2">Current Password</label>
@@ -268,18 +357,19 @@ const PasswordChange = () => {
               Clear
             </button>
           </div>
-        </form>
 
-        {/* Security Tips */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <h3 className="font-semibold text-blue-900 mb-2">Security Tips:</h3>
-          <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Use a unique password that you don't use elsewhere</li>
-            <li>• Include uppercase, lowercase, numbers, and special characters</li>
-            <li>• Never share your password with anyone</li>
-            <li>• Change your password regularly for better security</li>
-          </ul>
-        </div>
+          {/* Security Tips */}
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h3 className="font-semibold text-blue-900 mb-2">Security Tips:</h3>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• Use a unique password that you don't use elsewhere</li>
+              <li>• Include uppercase, lowercase, numbers, and special characters</li>
+              <li>• Never share your password with anyone</li>
+              <li>• Change your password regularly for better security</li>
+            </ul>
+          </div>
+        </form>
+        )}
       </div>
     </div>
   );

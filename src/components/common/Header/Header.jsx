@@ -12,6 +12,7 @@ import {
 } from 'react-icons/fi';
 import { useAuth } from '../../../context/AuthContext';
 import { useCart } from '../../../context/CartContext';
+import { useLogoSettings } from '../../../hooks/useLogoSettings';
 import { signOutUser } from '../../../services/firebase/auth';
 import { CATEGORIES } from '../../../utils/constants';
 import NotificationBell from './NotificationBell';
@@ -20,6 +21,7 @@ import './Header.css';
 const Header = () => {
   const { user, isAdmin } = useAuth();
   const { cartCount } = useCart();
+  const { logo } = useLogoSettings();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -56,8 +58,8 @@ const Header = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
-            <Link to="/" className="logo text-2xl font-bold text-orange-500">
-              SHOPKI
+            <Link to="/" className="logo">
+              <img src={logo || '/logo.png'} alt="Store Logo" style={{ height: '50px', width: 'auto' }} />
             </Link>
 
             {/* Search Bar */}

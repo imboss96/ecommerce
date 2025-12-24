@@ -37,16 +37,18 @@ export const ProfilePage = () => {
               </div>
             )}
             <div>
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-2 mb-2">
                 <h1 className="text-3xl font-bold text-gray-800">
                   {userData?.displayName || 'User'}
                 </h1>
                 {userData?.verified && (
-                  <div className="relative group">
-                    <div className="flex items-center justify-center w-7 h-7 bg-blue-500 rounded-full border-2 border-white shadow-md">
-                      <FiCheck className="w-4 h-4 text-white" />
+                  <div className="relative group" title="Verified Member">
+                    <div className="flex items-center justify-center w-6 h-6 bg-blue-500 rounded-full shadow-md hover:bg-blue-600 transition cursor-help">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
                     </div>
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-10">
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-10">
                       Verified Member
                     </div>
                   </div>
@@ -64,6 +66,17 @@ export const ProfilePage = () => {
                     ✓ Verified on {new Date(userData.verifiedAt).toLocaleDateString()}
                   </p>
                 )}
+              </div>
+              <div className="mt-3">
+                <span className={`px-4 py-2 rounded-full text-sm font-semibold inline-block ${
+                  userData?.role === 'vendor'
+                    ? 'bg-green-100 text-green-800'
+                    : userData?.role === 'admin'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-blue-100 text-blue-800'
+                }`}>
+                  {userData?.role === 'vendor' ? '🏪 Vendor' : userData?.role === 'admin' ? '👨‍💼 Admin' : '👤 Buyer'}
+                </span>
               </div>
             </div>
           </div>

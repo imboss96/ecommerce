@@ -9,6 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Layout Components
 import Header from './components/common/Header/Header';
@@ -42,14 +43,18 @@ import AdminRoute from './routes/AdminRoute';
 import './App.css';
 
 function App() {
+  console.log('API Key:', process.env.REACT_APP_BREVO_API_KEY);
+  console.log('Sender Email:', process.env.REACT_APP_BREVO_SENDER_EMAIL);
+
   return (
     <Router>
       <AuthProvider>
         <CartProvider>
           <NotificationProvider>
-            <div className="App min-h-screen flex flex-col">
-            {/* Toast Notifications */}
-            <ToastContainer
+            <ThemeProvider>
+              <div className="App min-h-screen flex flex-col">
+              {/* Toast Notifications */}
+              <ToastContainer
               position="top-right"
               autoClose={3000}
               hideProgressBar={false}
@@ -126,7 +131,8 @@ function App() {
 
             {/* Footer */}
             <Footer />
-          </div>
+              </div>
+            </ThemeProvider>
           </NotificationProvider>
         </CartProvider>
       </AuthProvider>
