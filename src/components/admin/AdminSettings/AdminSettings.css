@@ -4,6 +4,40 @@
   padding: 30px 20px;
 }
 
+/* Settings Tabs */
+.settings-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings-tab {
+  padding: 12px 24px;
+  border: 2px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.settings-tab:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.settings-tab.active {
+  border-color: #ff9800;
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  color: white;
+}
+
 .settings-card {
   background: white;
   border-radius: 12px;

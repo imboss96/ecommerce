@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLogoSettings } from '../../../hooks/useLogoSettings';
 import { uploadToCloudinary } from '../../../services/cloudinary/upload';
+import EmailTemplateEditor from '../EmailTemplateEditor/EmailTemplateEditor';
 import './AdminSettings.css';
 
 const AdminSettings = () => {
@@ -9,6 +10,7 @@ const AdminSettings = () => {
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('branding'); // 'branding' or 'email'
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
@@ -59,81 +61,105 @@ const AdminSettings = () => {
 
   return (
     <div className="admin-settings-container">
-      <div className="settings-card">
-        <h2 className="settings-title">🎨 Branding Settings</h2>
-        <p className="settings-subtitle">Manage your store's logo and branding</p>
+      {/* Settings Tabs */}
+      <div className="settings-tabs">
+        <button 
+          className={`settings-tab ${activeTab === 'branding' ? 'active' : ''}`}
+          onClick={() => setActiveTab('branding')}
+        >
+          🎨 Branding
+        </button>
+        <button 
+          className={`settings-tab ${activeTab === 'email' ? 'active' : ''}`}
+          onClick={() => setActiveTab('email')}
+        >
+          📧 Email Templates
+        </button>
+      </div>
 
-        <div className="logo-section">
-          <h3 className="section-title">Store Logo</h3>
-          <p className="section-description">Upload a logo that will appear in your navbar and emails (PNG, JPG, recommended 200x80px)</p>
+      {/* Branding Tab */}
+      {activeTab === 'branding' && (
+        <div className="settings-card">
+          <h2 className="settings-title">🎨 Branding Settings</h2>
+          <p className="settings-subtitle">Manage your store's logo and branding</p>
 
-          {/* Logo Preview */}
-          <div className="logo-preview-container">
-            <div className="logo-preview">
-              {logoPreview && (
-                <img 
-                  src={logoPreview} 
-                  alt="Logo Preview" 
-                  className="logo-image"
-                  onError={() => setLogoPreview('/logo.png')}
-                />
-              )}
-            </div>
-            <p className="preview-label">Current Logo</p>
-          </div>
+          <div className="logo-section">
+            <h3 className="section-title">Store Logo</h3>
+            <p className="section-description">Upload a logo that will appear in your navbar and emails (PNG, JPG, recommended 200x80px)</p>
 
-          {/* File Upload */}
-          <div className="upload-section">
-            <label className="upload-label">
-              <div className="upload-box">
-                <div className="upload-icon">📤</div>
-                <p className="upload-text">
-                  {uploading ? 'Uploading...' : 'Click to upload or drag and drop'}
-                </p>
-                <p className="upload-hint">PNG, JPG, GIF (max 5MB)</p>
+            {/* Logo Preview */}
+            <div className="logo-preview-container">
+              <div className="logo-preview">
+                {logoPreview && (
+                  <img 
+                    src={logoPreview} 
+                    alt="Logo Preview" 
+                    className="logo-image"
+                    onError={() => setLogoPreview('/logo.png')}
+                  />
+                )}
               </div>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleLogoUpload}
-                disabled={uploading}
-                className="upload-input"
-              />
-            </label>
-          </div>
-
-          {/* Messages */}
-          {success && (
-            <div className="alert alert-success">
-              ✅ Logo updated successfully! Changes will appear across your store.
+              <p className="preview-label">Current Logo</p>
             </div>
-          )}
 
-          {error && (
-            <div className="alert alert-error">
-              ❌ {error}
+            {/* File Upload */}
+            <div className="upload-section">
+              <label className="upload-label">
+                <div className="upload-box">
+                  <div className="upload-icon">📤</div>
+                  <p className="upload-text">
+                    {uploading ? 'Uploading...' : 'Click to upload or drag and drop'}
+                  </p>
+                  <p className="upload-hint">PNG, JPG, GIF (max 5MB)</p>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  disabled={uploading}
+                  className="upload-input"
+                />
+              </label>
             </div>
-          )}
 
-          {uploading && (
-            <div className="loading-bar">
-              <div className="progress"></div>
+            {/* Messages */}
+            {success && (
+              <div className="alert alert-success">
+                ✅ Logo updated successfully! Changes will appear across your store.
+              </div>
+            )}
+
+            {error && (
+              <div className="alert alert-error">
+                ❌ {error}
+              </div>
+            )}
+
+            {uploading && (
+              <div className="loading-bar">
+                <div className="progress"></div>
+              </div>
+            )}
+
+            {/* Info */}
+            <div className="info-box">
+              <h4>ℹ️ Where your logo appears:</h4>
+              <ul>
+                <li>✓ Website navbar (top left)</li>
+                <li>✓ Welcome emails</li>
+                <li>✓ Order confirmation emails</li>
+                <li>✓ Shipping notification emails</li>
+                <li>✓ All transactional emails</li>
+              </ul>
             </div>
-          )}
-
-          {/* Info */}
-          <div className="info-box">
-            <h4>ℹ️ Where your logo appears:</h4>
-            <ul>
-              <li>✓ Website navbar (top left)</li>
-              <li>✓ Welcome emails</li>
-              <li>✓ Order confirmation emails</li>
-              <li>✓ Shipping notification emails</li>
-              <li>✓ All transactional emails</li>
-            </ul>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Email Templates Tab */}
+      {activeTab === 'email' && (
+        <EmailTemplateEditor />
+      )}
     </div>
   );
 };

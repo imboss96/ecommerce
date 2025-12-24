@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { DEFAULT_EMAIL_TEMPLATES } from '../../utils/defaultEmailTemplates';
 
 const BREVO_API_BASE = 'https://api.brevo.com/v3';
 
@@ -36,6 +37,37 @@ export const getLogoUrl = async () => {
     console.error('Error fetching logo URL:', err);
     return `${process.env.REACT_APP_BASE_URL}/logo.png`; // Fallback
   }
+};
+
+// Fetch email template from Firestore with fallback to defaults
+export const getEmailTemplate = async (templateType) => {
+  try {
+    const docRef = doc(db, 'emailTemplates', templateType);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return docSnap.data();
+    }
+    
+    // Return default template if custom not found
+    return DEFAULT_EMAIL_TEMPLATES[templateType] || null;
+  } catch (err) {
+    console.error(`Error fetching email template (${templateType}):`, err);
+    // Fallback to default template
+    return DEFAULT_EMAIL_TEMPLATES[templateType] || null;
+  }
+};
+
+// Replace template variables with actual values
+export const replaceTemplateVariables = (template, variables) => {
+  let content = template;
+  
+  Object.keys(variables).forEach(key => {
+    const regex = new RegExp(`{{${key}}}`, 'g');
+    content = content.replace(regex, variables[key] || '');
+  });
+  
+  return content;
 };
 
 /**
@@ -111,30 +143,6 @@ export const subscribeToNewsletter = async ({ email, firstName = '', lastName = 
       error: error.response?.data?.message || error.message 
     };
   }
-};
-
-/**
- * Send password reset email
- * @param {string} email - User email
- * @param {string} resetLink - Password reset link
- * @returns {Promise}
- */
-export const sendPasswordResetEmail = async (email, resetLink) => {
-  const htmlContent = `
-    <h2>Password Reset Request</h2>
-    <p>Click the link below to reset your password:</p>
-    <a href="${resetLink}" style="background-color: #ff9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">
-      Reset Password
-    </a>
-    <p>This link will expire in 1 hour.</p>
-    <p>If you didn't request this, please ignore this email.</p>
-  `;
-
-  return sendTransactionalEmail({
-    email,
-    subject: 'Reset Your Shopki Password',
-    htmlContent
-  });
 };
 
 /**
@@ -472,11 +480,40 @@ export const sendWelcomeEmail = async (email, firstName = 'Valued Customer') => 
   });
 };
 
+export const sendPasswordResetEmail = async (email, resetLink) => {
+  try {
+    const template = await getEmailTemplate('passwordReset');
+    
+    if (!template) {
+      console.error('Password reset email template not found');
+      return { success: false, error: 'Template not found' };
+    }
+
+    const htmlContent = replaceTemplateVariables(template.htmlContent, {
+      resetLink,
+      expirationTime: '1 hour',
+      email
+    });
+
+    return sendTransactionalEmail({
+      email,
+      subject: template.subject,
+      htmlContent
+    });
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 export default {
   sendTransactionalEmail,
   subscribeToNewsletter,
   sendPasswordResetEmail,
   sendOrderConfirmationEmail,
   sendOrderStatusEmail,
-  sendWelcomeEmail
+  sendWelcomeEmail,
+  getEmailTemplate,
+  replaceTemplateVariables,
+  getLogoUrl
 };
