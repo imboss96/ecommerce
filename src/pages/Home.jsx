@@ -8,9 +8,6 @@ import {
   FiShield, 
   FiCreditCard, 
   FiHeadphones,
-  FiUser,
-  FiLogIn,
-  FiShoppingCart,
   FiHeart
 } from 'react-icons/fi';
 import { getProducts, getCategories } from '../services/firebase/firestoreHelpers';
@@ -80,78 +77,8 @@ const Home = () => {
     setAuthModalOpen(true);
   };
 
-  const handleProfileClick = () => {
-    if (isAuthenticated) {
-      navigate('/profile');
-    } else {
-      openAuthModal('login');
-    }
-  };
-
-  const handleCartClick = () => {
-    navigate('/cart');
-  };
-
   return (
     <div className="home-page bg-gray-50">
-      {/* Top Bar with Auth & Cart */}
-      <div className="bg-gray-900 text-white py-2">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center text-sm">
-            <div className="flex items-center gap-4">
-              <span className="text-gray-300">📞 Call us: +254 748661149</span>
-              <span className="hidden md:inline text-gray-300">|</span>
-              <span className="hidden md:inline text-gray-300">✉️ support@shopki.com</span>
-            </div>
-            <div className="flex items-center gap-4">
-              {/* Cart Icon - Always visible */}
-              <button
-                onClick={handleCartClick}
-                className="flex items-center gap-2 hover:text-orange-400 transition relative"
-              >
-                <FiShoppingCart className="text-lg" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                    {cartCount > 9 ? '9+' : cartCount}
-                  </span>
-                )}
-                <span className="hidden sm:inline">Cart</span>
-              </button>
-
-              <span className="text-gray-600">|</span>
-
-              {/* User Auth Section */}
-              {isAuthenticated ? (
-                <button
-                  onClick={handleProfileClick}
-                  className="flex items-center gap-2 hover:text-orange-400 transition"
-                >
-                  <FiUser />
-                  <span>Hi, {userData?.displayName?.split(' ')[0] || 'User'}</span>
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={() => openAuthModal('login')}
-                    className="flex items-center gap-1 hover:text-orange-400 transition"
-                  >
-                    <FiLogIn className="text-xs" />
-                    Login
-                  </button>
-                  <span>|</span>
-                  <button
-                    onClick={() => openAuthModal('signup')}
-                    className="hover:text-orange-400 transition"
-                  >
-                    Sign Up
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Hero Section with Promo Banner */}
       <section className="hero-section py-8 bg-white">
         <div className="container mx-auto px-4">
