@@ -1,13 +1,14 @@
 // src/pages/admin/AdminDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../../services/firebase/config';
+import { db } from '../../services/firebase/config';
 import { FiEdit2, FiTrash2, FiX, FiUpload, FiShoppingCart, FiBarChart2 } from 'react-icons/fi';
 import { CATEGORIES } from '../../utils/constants';
 import CategoryDropdown from '../../components/admin/CategoryDropdown';
 import FinanceAnalytics from '../../components/admin/FinanceAnalytics';
+import ProductImageUpload from '../../components/admin/Products/ProductImageUpload';
 import { updateOrderStatus } from '../../services/firebase/firestoreHelpers';
+import { toast } from 'react-toastify';
 
 const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
@@ -160,56 +161,15 @@ const AdminDashboard = () => {
     setShowForm(false);
   };
 
-  // Handle image file upload to Firebase Storage
-  const handleImageUpload = async (files) => {
-    if (!files || files.length === 0) return;
+  // Handle image upload via Cloudinary
+  const handleImageUpload = (uploadedUrls) => {
+    if (!uploadedUrls || uploadedUrls.length === 0) return;
 
-    setUploadingImage(true);
-    const uploadedUrls = [];
-
-    try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-          alert(`${file.name} is not an image file`);
-          continue;
-        }
-
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-          alert(`${file.name} is too large. Max size is 5MB`);
-          continue;
-        }
-
-        // Create unique filename
-        const timestamp = Date.now();
-        const randomStr = Math.random().toString(36).substring(2, 9);
-        const fileName = `products/${timestamp}_${randomStr}_${file.name}`;
-        
-        // Upload to Firebase Storage
-        const storageRef = ref(storage, fileName);
-        await uploadBytes(storageRef, file);
-        
-        // Get download URL
-        const downloadURL = await getDownloadURL(storageRef);
-        uploadedUrls.push(downloadURL);
-      }
-
-      // Add uploaded URLs to existing images
-      if (uploadedUrls.length > 0) {
-        const currentUrls = formData.images ? formData.images.split(',').filter(u => u.trim()) : [];
-        const allUrls = [...currentUrls, ...uploadedUrls];
-        setFormData({ ...formData, images: allUrls.join(', ') });
-        alert(`Successfully uploaded ${uploadedUrls.length} image(s)`);
-      }
-    } catch (error) {
-      console.error('Error uploading images:', error);
-      alert('Error uploading images: ' + error.message);
-    } finally {
-      setUploadingImage(false);
-    }
+    // Add uploaded URLs to existing images
+    const currentUrls = formData.images ? formData.images.split(',').filter(u => u.trim()) : [];
+    const allUrls = [...currentUrls, ...uploadedUrls];
+    setFormData({ ...formData, images: allUrls.join(', ') });
+    toast.success(`Successfully uploaded ${uploadedUrls.length} image(s)`);
   };
 
   const handleEdit = (product) => {
@@ -620,73 +580,44 @@ const AdminDashboard = () => {
 
                     {/* Tab Content */}
                     <div>
-                      {/* File Upload Section */}
-                      <div className="space-y-3">
-                        <label
-                          htmlFor="imageFileInput"
-                          className="block w-full cursor-pointer"
-                        >
-                          <div className="border-2 border-dashed border-orange-300 rounded-lg p-6 text-center hover:border-orange-500 transition bg-white">
-                            <FiUpload className="mx-auto text-3xl text-orange-500 mb-2" />
-                            <p className="font-medium text-gray-700">
-                              {uploadingImage ? 'Uploading...' : 'Click to upload images'}
-                            </p>
-                            <p className="text-sm text-gray-500 mt-1">
-                              or drag and drop images here
-                            </p>
-                            <p className="text-xs text-gray-400 mt-2">
-                              PNG, JPG, WEBP up to 5MB each
-                            </p>
-                          </div>
+                      {/* Cloudinary Image Upload Component */}
+                      <ProductImageUpload 
+                        onImagesUpload={handleImageUpload}
+                        initialImages={formData.images ? formData.images.split(',').map(u => u.trim()).filter(u => u) : []}
+                        maxImages={5}
+                        title="Product Images (Powered by Cloudinary)"
+                      />
+
+                      {/* URL Input Section */}
+                      <div className="pt-3 border-t mt-6">
+                        <p className="text-sm font-medium text-gray-700 mb-2">Or add image URLs manually:</p>
+                        <div className="flex gap-2">
                           <input
-                            id="imageFileInput"
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={(e) => handleImageUpload(e.target.files)}
-                            disabled={uploadingImage}
-                            className="hidden"
+                            type="url"
+                            id="imageUrlInput"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 text-sm"
+                            placeholder="https://example.com/image.jpg"
                           />
-                        </label>
-
-                        {uploadingImage && (
-                          <div className="flex items-center justify-center gap-2 text-orange-500">
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-orange-500 border-t-transparent"></div>
-                            <span className="text-sm">Uploading images...</span>
-                          </div>
-                        )}
-
-                        {/* URL Input Section */}
-                        <div className="pt-3 border-t">
-                          <p className="text-sm font-medium text-gray-700 mb-2">Or add image URL:</p>
-                          <div className="flex gap-2">
-                            <input
-                              type="url"
-                              id="imageUrlInput"
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 text-sm"
-                              placeholder="https://example.com/image.jpg"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const input = document.getElementById('imageUrlInput');
-                                const url = input.value.trim();
-                                if (url) {
-                                  const currentUrls = formData.images ? formData.images.split(',').filter(u => u.trim()) : [];
-                                  currentUrls.push(url);
-                                  setFormData({ ...formData, images: currentUrls.join(', ') });
-                                  input.value = '';
-                                }
-                              }}
-                              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition whitespace-nowrap text-sm"
-                            >
-                              Add URL
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const input = document.getElementById('imageUrlInput');
+                              const url = input.value.trim();
+                              if (url) {
+                                const currentUrls = formData.images ? formData.images.split(',').filter(u => u.trim()) : [];
+                                currentUrls.push(url);
+                                setFormData({ ...formData, images: currentUrls.join(', ') });
+                                input.value = '';
+                              }
+                            }}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition whitespace-nowrap text-sm"
+                          >
+                            Add URL
+                          </button>
                         </div>
 
                         {/* Bulk URL Paste */}
-                        <details className="bg-white rounded-lg p-3 border">
+                        <details className="bg-white rounded-lg p-3 border mt-3">
                           <summary className="cursor-pointer text-sm font-medium text-gray-700">
                             Paste multiple URLs at once
                           </summary>
@@ -707,7 +638,7 @@ const AdminDashboard = () => {
                           />
                         </details>
 
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 mt-3">
                           💡 Free images:{' '}
                           <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                             Unsplash

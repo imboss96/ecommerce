@@ -4,18 +4,38 @@ import axios from 'axios';
 const CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
 
+console.log('🔧 Cloudinary Config:', { CLOUD_NAME, UPLOAD_PRESET });
+
 // Upload single image to Cloudinary
 export const uploadImage = async (file) => {
   try {
+    console.log('📤 Starting upload for:', file.name);
+    console.log('📊 File size:', file.size, 'bytes');
+    console.log('📝 File type:', file.type);
+    
+    if (!CLOUD_NAME || !UPLOAD_PRESET) {
+      throw new Error('Cloudinary credentials not configured. Check .env file.');
+    }
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', UPLOAD_PRESET);
     formData.append('cloud_name', CLOUD_NAME);
 
+    console.log('🚀 Uploading to Cloudinary...');
+    
     const response = await axios.post(
       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-      formData
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 60000 // 60 seconds timeout
+      }
     );
+
+    console.log('✅ Upload successful:', response.data.secure_url);
 
     return {
       success: true,
@@ -27,6 +47,13 @@ export const uploadImage = async (file) => {
       }
     };
   } catch (error) {
+    console.error('❌ Upload error:', error);
+    console.error('Error message:', error.message);
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    }
+    
     return {
       success: false,
       error: error.message || 'Failed to upload image'

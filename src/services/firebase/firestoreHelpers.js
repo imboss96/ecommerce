@@ -392,25 +392,31 @@ export const getOrderById = async (orderId) => {
  */
 export const updateOrderStatus = async (orderId, status) => {
   try {
+    console.log(`📝 Updating order ${orderId} status to: ${status}`);
+    
     const docRef = doc(db, 'orders', orderId);
     
     // Fetch the order to get user and order details
     const orderSnap = await getDoc(docRef);
     if (!orderSnap.exists()) {
+      console.error('❌ Order not found:', orderId);
       return { success: false, error: 'Order not found' };
     }
     
     const orderData = orderSnap.data();
+    console.log('✅ Order found:', { userEmail: orderData.userEmail, userName: orderData.userName });
     
     // Update the order status in Firestore
     await updateDoc(docRef, {
       status,
       updatedAt: serverTimestamp()
     });
+    console.log(`✅ Status updated in Firestore for order ${orderId}`);
     
     // Send email notification to user
     if (orderData.userEmail) {
-      await sendOrderStatusEmail(
+      console.log(`📧 Sending email to ${orderData.userEmail}...`);
+      const emailResult = await sendOrderStatusEmail(
         orderData.userEmail,
         orderData.userName || 'Customer',
         orderId,
@@ -418,9 +424,12 @@ export const updateOrderStatus = async (orderId, status) => {
         orderData.items || [],
         orderData.total || 0
       );
+      console.log('📧 Email result:', emailResult);
+    } else {
+      console.warn('⚠️ No email found for order:', orderId);
     }
     
-    console.log('✅ Order status updated:', orderId, '-> Email sent to:', orderData.userEmail);
+    console.log('✅ Order status updated successfully:', orderId);
     return { success: true, error: null };
     
   } catch (error) {
