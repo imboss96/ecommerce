@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
+import './styles/responsive.css';
 
 // Production security measures
 if (process.env.NODE_ENV === 'production') {

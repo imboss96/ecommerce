@@ -3,6 +3,7 @@ import axios from 'axios';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { DEFAULT_EMAIL_TEMPLATES } from '../../utils/defaultEmailTemplates';
+import { saveEmailToAdminInbox } from './adminEmailService';
 
 const BREVO_API_BASE = 'https://api.brevo.com/v3';
 
@@ -77,6 +78,7 @@ export const replaceTemplateVariables = (template, variables) => {
  * @param {string} htmlContent - HTML content
  * @param {string} senderName - Sender name
  * @param {string} senderEmail - Sender email
+ * @param {Object} options - { saveToAdminInbox, emailType, relatedData }
  * @returns {Promise}
  */
 export const sendTransactionalEmail = async ({
@@ -84,7 +86,10 @@ export const sendTransactionalEmail = async ({
   subject,
   htmlContent,
   senderName = 'Aruviah',
-  senderEmail = process.env.REACT_APP_BREVO_SENDER_EMAIL
+  senderEmail = process.env.REACT_APP_BREVO_SENDER_EMAIL,
+  saveToAdminInbox = true,
+  emailType = 'general',
+  relatedData = {}
 }) => {
   try {
     const brevoClient = getBrevClient();
@@ -105,7 +110,37 @@ export const sendTransactionalEmail = async ({
     });
     
     console.log('✅ Email sent successfully:', response.data.messageId);
-    return { success: true, messageId: response.data.messageId };
+    
+    // Save to admin inbox if enabled
+    let adminSaveResult = null;
+    if (saveToAdminInbox) {
+      try {
+        adminSaveResult = await saveEmailToAdminInbox({
+          to: email,
+          from: senderEmail || 'noreply@aruviah.com',
+          subject,
+          htmlContent,
+          type: emailType,
+          relatedData,
+          isSent: true // Mark as sent email
+        });
+        
+        if (adminSaveResult.success) {
+          console.log('✅ Email also saved to admin inbox:', adminSaveResult.emailId);
+        } else {
+          console.error('❌ Failed to save to admin inbox:', adminSaveResult.error);
+        }
+      } catch (saveError) {
+        console.error('❌ Error saving to admin inbox:', saveError);
+        adminSaveResult = { success: false, error: saveError.message };
+      }
+    }
+    
+    return { 
+      success: true, 
+      messageId: response.data.messageId,
+      adminEmailId: adminSaveResult?.emailId || null 
+    };
   } catch (error) {
     console.error('❌ Brevo email error:', error.response?.data || error.message);
     console.error('Error details:', error.response?.status, error.response?.statusText);
@@ -113,6 +148,25 @@ export const sendTransactionalEmail = async ({
       success: false, 
       error: error.response?.data?.message || error.message 
     };
+  }
+};
+
+/**
+ * Alias for sendTransactionalEmail for compatibility
+ * Handles both object and positional argument styles
+ */
+export const sendBrevEmail = async (arg1, arg2, arg3) => {
+  // Handle object argument style: sendBrevEmail({ to, subject, htmlContent })
+  if (typeof arg1 === 'object' && arg1 !== null && !Array.isArray(arg1)) {
+    return sendTransactionalEmail(arg1);
+  }
+  // Handle positional argument style: sendBrevEmail(email, subject, htmlContent)
+  else {
+    return sendTransactionalEmail({
+      email: arg1,
+      subject: arg2,
+      htmlContent: arg3
+    });
   }
 };
 
@@ -626,6 +680,7 @@ export const getNewsletterSubscribers = async (listId = null, limit = 500, offse
 
 export default {
   sendTransactionalEmail,
+  sendBrevEmail: sendTransactionalEmail, // Alias for compatibility
   subscribeToNewsletter,
   sendPasswordResetEmail,
   sendOrderConfirmationEmail,

@@ -461,5 +461,96 @@ export const DEFAULT_EMAIL_TEMPLATES = {
         </body>
       </html>
     `
+  },
+
+  vendorApplication: {
+    subject: 'New Vendor Application - {{businessName}} | Admin Review Required',
+    htmlContent: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+            .header { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; padding: 30px 20px; text-align: center; }
+            .content { padding: 40px 30px; }
+            .alert { background-color: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0; border-radius: 4px; }
+            .info-box { background-color: #f5f5f5; padding: 20px; border-radius: 6px; margin: 20px 0; }
+            .info-row { display: flex; margin: 12px 0; }
+            .info-label { font-weight: 600; width: 150px; color: #ff9800; }
+            .info-value { flex: 1; }
+            .action-buttons { text-align: center; margin-top: 30px; }
+            .btn { display: inline-block; padding: 12px 24px; margin: 0 10px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; }
+            .btn-approve { background-color: #4caf50; color: white; }
+            .btn-review { background-color: #2196f3; color: white; }
+            .footer { background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eee; font-size: 12px; color: #888; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🏪 New Vendor Application</h1>
+            </div>
+            <div class="content">
+              <div class="alert">
+                <strong>⚠️ ACTION REQUIRED:</strong> A new vendor application has been submitted and requires review.
+              </div>
+
+              <h3 style="color: #ff9800;">Applicant Details</h3>
+              <div class="info-box">
+                <div class="info-row">
+                  <span class="info-label">Name:</span>
+                  <span class="info-value">{{firstName}} {{lastName}}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Email:</span>
+                  <span class="info-value">{{email}}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Phone:</span>
+                  <span class="info-value">{{phone}}</span>
+                </div>
+              </div>
+
+              <h3 style="color: #ff9800;">Business Information</h3>
+              <div class="info-box">
+                <div class="info-row">
+                  <span class="info-label">Business Name:</span>
+                  <span class="info-value">{{businessName}}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Category:</span>
+                  <span class="info-value">{{businessCategory}}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Address:</span>
+                  <span class="info-value">{{businessAddress}}</span>
+                </div>
+              </div>
+
+              <h3 style="color: #ff9800;">Business Description</h3>
+              <div class="info-box">
+                <p style="margin: 0;">{{businessDescription}}</p>
+              </div>
+
+              <div class="action-buttons">
+                <a href="{{adminDashboardLink}}" class="btn btn-review">📊 Review Application</a>
+              </div>
+
+              <p style="margin-top: 30px; text-align: center; color: #888; font-size: 12px;">
+                Application ID: {{applicationId}}<br>
+                Submitted: {{submittedDate}}
+              </p>
+            </div>
+            <div class="footer">
+              <p>© 2025 Aruviah Stores. All rights reserved.</p>
+              <p>This is an automated email. Please do not reply directly.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `
   }
 };

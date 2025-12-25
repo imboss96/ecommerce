@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { FiSettings, FiMail, FiUsers, FiShoppingCart } from 'react-icons/fi';
+import { FiSettings, FiMail, FiUsers, FiShoppingCart, FiInbox } from 'react-icons/fi';
 import { useLogoSettings } from '../../../hooks/useLogoSettings';
 import { uploadToCloudinary } from '../../../services/cloudinary/upload';
 import EmailTemplateEditor from '../EmailTemplateEditor/EmailTemplateEditor';
 import NewsletterSubscribers from '../Newsletter/NewsletterSubscribers';
 import VendorApplications from '../vendor/VendorApplications';
+import AdminEmailInbox from '../AdminEmailInbox/AdminEmailInbox';
 import './AdminSettings.css';
 
 const AdminSettings = () => {
@@ -71,6 +72,12 @@ const AdminSettings = () => {
           onClick={() => setActiveTab('branding')}
         >
           <FiSettings size={18} /> Branding
+        </button>
+        <button 
+          className={`settings-tab ${activeTab === 'emails-inbox' ? 'active' : ''}`}
+          onClick={() => setActiveTab('emails-inbox')}
+        >
+          <FiInbox size={18} /> Email Inbox
         </button>
         <button 
           className={`settings-tab ${activeTab === 'email' ? 'active' : ''}`}
@@ -169,6 +176,11 @@ const AdminSettings = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Email Inbox Tab */}
+      {activeTab === 'emails-inbox' && (
+        <AdminEmailInbox />
       )}
 
       {/* Email Templates Tab */}

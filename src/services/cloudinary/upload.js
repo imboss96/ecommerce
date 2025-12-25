@@ -17,12 +17,18 @@ export const uploadImage = async (file) => {
       throw new Error('Cloudinary credentials not configured. Check .env file.');
     }
 
+    if (!file || file.size === 0) {
+      throw new Error('File is empty or invalid');
+    }
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', UPLOAD_PRESET);
-    formData.append('cloud_name', CLOUD_NAME);
+    // DO NOT append cloud_name - it goes in the URL only
 
     console.log('🚀 Uploading to Cloudinary...');
+    console.log('   Cloud Name:', CLOUD_NAME);
+    console.log('   Upload Preset:', UPLOAD_PRESET);
     
     const response = await axios.post(
       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,

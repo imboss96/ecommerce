@@ -708,6 +708,9 @@ export const sendApplicationReceivedNotification = async (appData, applicationId
     const { sendVendorApplicationReceivedEmail } = await import('../email/emailAutomation');
     await sendVendorApplicationReceivedEmail(email, displayName, businessName);
 
+    // Send admin notification email
+    await sendAdminVendorApplicationNotification(appData, applicationId);
+
     // Create notification
     await createNotification({
       userId,
@@ -721,6 +724,123 @@ export const sendApplicationReceivedNotification = async (appData, applicationId
     return { success: true };
   } catch (error) {
     console.error('Error sending application received notification:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Send admin notification email for new vendor application
+ * @param {Object} appData - { userId, email, businessName, businessDescription, businessCategory, contactPhone, businessAddress, firstName }
+ * @param {string} applicationId - Application ID
+ * @returns {Object} - { success, error }
+ */
+export const sendAdminVendorApplicationNotification = async (appData, applicationId) => {
+  try {
+    const { 
+      email, 
+      businessName, 
+      businessDescription, 
+      businessCategory, 
+      contactPhone, 
+      businessAddress,
+      firstName = '',
+      lastName = ''
+    } = appData;
+
+    // Import email services
+    const { sendBrevEmail } = await import('../email/brevoService');
+    const { saveEmailToAdminInbox } = await import('../email/adminEmailService');
+    const { getEmailTemplate, getLogoUrl } = await import('../email/brevoService');
+    const { DEFAULT_EMAIL_TEMPLATES } = await import('../../utils/defaultEmailTemplates');
+
+    // Get admin email (usually from settings, fallback to default)
+    let adminEmail = process.env.REACT_APP_ADMIN_EMAIL || 'admin@aruviah.com';
+    try {
+      const settingsDoc = await getDoc(doc(db, 'settings', 'emails'));
+      if (settingsDoc.exists() && settingsDoc.data().adminEmail) {
+        adminEmail = settingsDoc.data().adminEmail;
+      }
+    } catch (err) {
+      console.warn('Could not fetch admin email from settings, using default');
+    }
+
+    // Get template or use default
+    let template;
+    try {
+      const templateDoc = await getDoc(doc(db, 'emailTemplates', 'vendorApplication'));
+      if (templateDoc.exists()) {
+        template = templateDoc.data();
+      } else {
+        template = DEFAULT_EMAIL_TEMPLATES.vendorApplication;
+      }
+    } catch (err) {
+      template = DEFAULT_EMAIL_TEMPLATES.vendorApplication;
+    }
+
+    // Prepare dynamic content
+    const adminDashboardLink = `${process.env.REACT_APP_BASE_URL}/admin?tab=vendors`;
+    const submittedDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Replace template variables
+    let htmlContent = template.htmlContent
+      .replace(/\{\{firstName\}\}/g, firstName || 'Vendor')
+      .replace(/\{\{lastName\}\}/g, lastName || '')
+      .replace(/\{\{email\}\}/g, email)
+      .replace(/\{\{phone\}\}/g, contactPhone)
+      .replace(/\{\{businessName\}\}/g, businessName)
+      .replace(/\{\{businessCategory\}\}/g, businessCategory)
+      .replace(/\{\{businessAddress\}\}/g, businessAddress)
+      .replace(/\{\{businessDescription\}\}/g, businessDescription)
+      .replace(/\{\{applicationId\}\}/g, applicationId)
+      .replace(/\{\{submittedDate\}\}/g, submittedDate)
+      .replace(/\{\{adminDashboardLink\}\}/g, adminDashboardLink);
+
+    const subject = template.subject
+      .replace(/\{\{businessName\}\}/g, businessName);
+
+    // Send email via Brevo
+    const emailPayload = {
+      to: [{
+        email: adminEmail,
+        name: 'Admin'
+      }],
+      subject,
+      htmlContent
+    };
+
+    const sendResult = await sendBrevEmail(emailPayload);
+    
+    // Save to admin inbox regardless of Brevo result (for internal storage)
+    await saveEmailToAdminInbox({
+      to: adminEmail,
+      from: email,
+      subject,
+      htmlContent,
+      type: 'vendor_application',
+      relatedId: applicationId,
+      relatedData: {
+        firstName,
+        lastName,
+        email,
+        phone: contactPhone,
+        businessName,
+        businessCategory,
+        businessAddress,
+        businessDescription,
+        applicationId,
+        submittedDate
+      }
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error sending admin vendor application notification:', error);
     return { success: false, error: error.message };
   }
 };
