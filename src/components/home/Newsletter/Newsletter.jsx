@@ -2,20 +2,30 @@
 
 import React, { useState } from 'react';
 import { FiMail, FiCheck } from 'react-icons/fi';
-import { subscribeToNewsletter, sendWelcomeEmail } from '../../../services/email/brevoService';
+import { subscribeToNewsletter } from '../../../services/email/brevoService';
+import { sendNewsletterConfirmation } from '../../../services/email/emailAutomation';
 import { toast } from 'react-toastify';
 import './Newsletter.css';
 
 const Newsletter = ({ variant = 'full' }) => {
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
 
+    console.log('Form submitted with:', { email, firstName, lastName });
+
     if (!email || !email.includes('@')) {
       toast.error('Please enter a valid email address');
+      return;
+    }
+
+    if (!firstName.trim()) {
+      toast.error('Please enter your first name');
       return;
     }
 
@@ -23,19 +33,24 @@ const Newsletter = ({ variant = 'full' }) => {
 
     try {
       // Subscribe to newsletter
+      console.log('Sending to Brevo:', { email, firstName: firstName.trim(), lastName: lastName.trim() });
       const result = await subscribeToNewsletter({
         email,
-        firstName: '',
-        lastName: ''
+        firstName: firstName.trim(),
+        lastName: lastName.trim()
       });
 
+      console.log('Brevo response:', result);
+
       if (result.success) {
-        // Send welcome email
-        await sendWelcomeEmail(email);
+        // Send newsletter confirmation email using admin template
+        await sendNewsletterConfirmation(email, firstName);
         
         setSubscribed(true);
         setEmail('');
-        toast.success('Welcome to Shopki newsletter! Check your email for confirmation.');
+        setFirstName('');
+        setLastName('');
+        toast.success('Welcome to Aruviah newsletter! Check your email for confirmation.');
         
         // Reset after 5 seconds
         setTimeout(() => {
@@ -61,14 +76,32 @@ const Newsletter = ({ variant = 'full' }) => {
             <p className="newsletter-compact-subtitle">Get exclusive deals, new arrivals, and special offers delivered to your inbox</p>
             
             <form onSubmit={handleSubscribe} className="newsletter-compact-form">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading || subscribed}
-                className="newsletter-compact-input"
-              />
+              <div className="newsletter-compact-fields">
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  disabled={loading || subscribed}
+                  className="newsletter-compact-input"
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  disabled={loading || subscribed}
+                  className="newsletter-compact-input"
+                />
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading || subscribed}
+                  className="newsletter-compact-input"
+                />
+              </div>
               <button
                 type="submit"
                 disabled={loading || subscribed}
@@ -113,6 +146,22 @@ const Newsletter = ({ variant = 'full' }) => {
 
           <form onSubmit={handleSubscribe} className="newsletter-form">
             <div className="newsletter-input-group">
+              <input
+                type="text"
+                placeholder="First Name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                disabled={loading || subscribed}
+                className="newsletter-input"
+              />
+              <input
+                type="text"
+                placeholder="Last Name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                disabled={loading || subscribed}
+                className="newsletter-input"
+              />
               <input
                 type="email"
                 placeholder="Enter your email address"

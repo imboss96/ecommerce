@@ -2,7 +2,7 @@
 
 ## ✅ What Was Added
 
-I've successfully added comprehensive account management features to your Shopki e-commerce application! Here's what's new:
+I've successfully added comprehensive account management features to your Aruviah e-commerce application! Here's what's new:
 
 ---
 
@@ -366,5 +366,5 @@ You now have a **production-ready account management system** with:
 
 ---
 
-**Your Shopki app now has enterprise-level account management! 🚀**
+**Your Aruviah app now has enterprise-level account management! 🚀**
 

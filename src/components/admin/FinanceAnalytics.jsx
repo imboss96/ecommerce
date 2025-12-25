@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiTrendingUp, FiDollarSign, FiShoppingCart, FiUsers, FiDownload } from 'react-icons/fi';
+import { FiTrendingUp, FiDollarSign, FiShoppingCart, FiUsers, FiDownload, FiBarChart2, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { useNotifications } from '../../context/NotificationContext';
 
 const FinanceAnalytics = ({ orders = [], products = [] }) => {
@@ -142,7 +142,7 @@ const FinanceAnalytics = ({ orders = [], products = [] }) => {
     }
   };
 
-  const downloadReport = () => {
+  const downloadReport = async () => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
       addNotification({
@@ -154,6 +154,26 @@ const FinanceAnalytics = ({ orders = [], products = [] }) => {
     }
     
     const periodText = getPeriodText();
+    
+    // Get current date/time for timestamp stamp
+    const now = new Date();
+    const timestamp = now.toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    
+    // Get admin user info from localStorage
+    const adminUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const adminName = adminUser.displayName || 'Admin User';
+    const adminEmail = adminUser.email || 'admin@aruviah.com';
+    
+    // Get logo URL
+    const logoUrl = localStorage.getItem('logoUrl') || '/logo.png';
     
     const htmlContent = `
       <!DOCTYPE html>
@@ -169,261 +189,365 @@ const FinanceAnalytics = ({ orders = [], products = [] }) => {
           }
           body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 40px;
-            max-width: 900px;
-            margin: 0 auto;
             color: #1f2937;
             line-height: 1.6;
           }
-          h1 {
-            color: #f97316;
-            border-bottom: 4px solid #f97316;
-            padding-bottom: 15px;
-            margin-bottom: 30px;
-            font-size: 32px;
+          
+          .page {
+            width: 8.5in;
+            height: 11in;
+            margin: 0 auto;
+            padding: 0.5in 0.75in;
+            background: white;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
           }
-          h2 {
-            color: #374151;
-            margin-top: 40px;
+          
+          /* Letterhead */
+          .letterhead {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #ff9800;
             margin-bottom: 20px;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 10px;
-            font-size: 24px;
           }
+          
+          .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+          }
+          
+          .logo-section img {
+            height: 60px;
+            width: auto;
+          }
+          
+          .company-info {
+            text-align: left;
+          }
+          
+          .company-info h1 {
+            color: #ff9800;
+            font-size: 24px;
+            margin: 0;
+            font-weight: 700;
+          }
+          
+          .company-info p {
+            color: #6b7280;
+            font-size: 12px;
+            margin: 3px 0;
+          }
+          
+          .timestamp-stamp {
+            text-align: right;
+            border: 2px solid #ff9800;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: #fff3e0;
+            font-size: 11px;
+          }
+          
+          .timestamp-stamp strong {
+            display: block;
+            color: #ff9800;
+            font-size: 12px;
+            margin-bottom: 3px;
+          }
+          
+          /* Content */
+          .content {
+            min-height: 6.5in;
+          }
+          
+          .report-title {
+            text-align: center;
+            margin-bottom: 5px;
+          }
+          
+          .report-title h2 {
+            color: #ff9800;
+            font-size: 20px;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          }
+          
+          .report-subtitle {
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 20px;
+          }
+          
           .header-info {
             background: #fef3c7;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            border-left: 5px solid #f59e0b;
-          }
-          .header-info p {
-            margin: 5px 0;
-            font-size: 14px;
-          }
-          .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin: 25px 0;
-          }
-          .metric-card {
-            border: 2px solid #e5e7eb;
-            padding: 20px;
-            border-radius: 10px;
-            background: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-          }
-          .metric-label {
-            color: #6b7280;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff9800;
             font-size: 13px;
-            margin-bottom: 8px;
+          }
+          
+          .header-info p {
+            margin: 4px 0;
+          }
+          
+          .header-info strong {
+            color: #ff9800;
+          }
+          
+          h3 {
+            color: #374151;
+            font-size: 14px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ff9800;
+            padding-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
           }
-          .metric-value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #f97316;
+          
+          .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
           }
+          
+          .metric-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #ff9800;
+          }
+          
+          .metric-label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .metric-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff9800;
+          }
+          
           table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            background: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin: 12px 0;
+            font-size: 12px;
           }
+          
           th, td {
-            padding: 14px 16px;
+            padding: 8px 10px;
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
           }
+          
           th {
-            background: #f9fafb;
+            background: #f3f4f6;
             font-weight: 600;
             color: #374151;
-            font-size: 14px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
           }
-          tr:hover {
-            background: #f9fafb;
-          }
+          
           tr:last-child td {
             border-bottom: none;
           }
-          .footer {
-            margin-top: 50px;
-            padding-top: 25px;
-            border-top: 3px solid #e5e7eb;
-            text-align: center;
-            color: #6b7280;
-            font-size: 13px;
-          }
-          .footer p {
-            margin: 8px 0;
-          }
+          
           .commission-info {
             background: #fef3c7;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid #f59e0b;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            border-left: 4px solid #ff9800;
+            font-size: 12px;
           }
+          
+          /* Footer */
+          .footer {
+            position: absolute;
+            bottom: 0.5in;
+            left: 0.75in;
+            right: 0.75in;
+            padding-top: 15px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            color: #6b7280;
+            font-size: 10px;
+          }
+          
+          .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+          }
+          
+          .footer-left, .footer-center, .footer-right {
+            flex: 1;
+          }
+          
+          .footer-center {
+            text-align: center;
+          }
+          
+          .footer-right {
+            text-align: right;
+          }
+          
+          .admin-info {
+            font-size: 10px;
+            color: #6b7280;
+          }
+          
+          .admin-info strong {
+            color: #374151;
+          }
+          
+          .page-number {
+            font-size: 10px;
+          }
+          
           @media print {
-            body { 
-              padding: 20px; 
+            body {
+              margin: 0;
+              padding: 0;
             }
-            .metric-card, table {
+            .page {
               box-shadow: none;
-              break-inside: avoid;
-            }
-            h2 {
-              page-break-after: avoid;
+              margin: 0;
+              width: 100%;
+              height: 100%;
+              break-after: page;
             }
           }
         </style>
       </head>
       <body>
-        <h1>📊 Finance Analytics Report</h1>
-        
-        <div class="header-info">
-          <p><strong>Generated:</strong> ${new Date().toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}</p>
-          <p><strong>Period:</strong> ${periodText}</p>
-          <p><strong>Total Orders:</strong> ${financialData.orderStats.total}</p>
-        </div>
+        <div class="page">
+          <!-- Letterhead -->
+          <div class="letterhead">
+            <div class="logo-section">
+              <img src="${logoUrl}" alt="Aruviah Logo" />
+              <div class="company-info">
+                <h1>ARUVIAH</h1>
+                <p>E-Commerce Platform</p>
+                <p>Financial Analytics Report</p>
+              </div>
+            </div>
+            <div class="timestamp-stamp">
+              <strong>⏱ GENERATED</strong>
+              ${timestamp}<br/>
+              <span style="font-size: 10px;">System Timestamp</span>
+            </div>
+          </div>
+          
+          <!-- Content -->
+          <div class="content">
+            <div class="report-title">
+              <h2>Finance Analytics Report</h2>
+              <div class="report-subtitle">Period: ${periodText}</div>
+            </div>
+            
+            <div class="header-info">
+              <p><strong>Report Date:</strong> ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              <p><strong>Period:</strong> ${periodText}</p>
+              <p><strong>Total Orders:</strong> ${financialData.orderStats.total}</p>
+            </div>
 
-        <h2>💰 Financial Overview</h2>
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <div class="metric-label">Total Revenue</div>
-            <div class="metric-value">${formatCurrency(financialData.totalRevenue)}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Platform Profit</div>
-            <div class="metric-value">${formatCurrency(financialData.totalProfit)}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Seller Payouts</div>
-            <div class="metric-value">${formatCurrency(financialData.sellerPayouts)}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Total Commission</div>
-            <div class="metric-value">${formatCurrency(financialData.totalCommission)}</div>
-          </div>
-        </div>
-        
-        <div class="commission-info">
-          <strong>Commission Structure:</strong> Platform retains 4% commission on all transactions. 
-          Sellers receive 96% of the transaction value.
-        </div>
+            <h3>Financial Overview</h3>
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="metric-label">Total Revenue</div>
+                <div class="metric-value">${formatCurrency(financialData.totalRevenue)}</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Platform Profit</div>
+                <div class="metric-value">${formatCurrency(financialData.totalProfit)}</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Seller Payouts</div>
+                <div class="metric-value">${formatCurrency(financialData.sellerPayouts)}</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Total Commission</div>
+                <div class="metric-value">${formatCurrency(financialData.totalCommission)}</div>
+              </div>
+            </div>
+            
+            <div class="commission-info">
+              <strong>Commission Structure:</strong> Platform retains 4% commission on all transactions. Sellers receive 96% of transaction value.
+            </div>
 
-        <h2>📦 Order Statistics</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Status</th>
-              <th style="text-align: right;">Count</th>
-              <th style="text-align: right;">Percentage</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="background: #f0fdf4;">
-              <td><strong>Total Orders</strong></td>
-              <td style="text-align: right;"><strong>${financialData.orderStats.total}</strong></td>
-              <td style="text-align: right;"><strong>100%</strong></td>
-            </tr>
-            <tr>
-              <td>✅ Completed</td>
-              <td style="text-align: right;">${financialData.orderStats.completed}</td>
-              <td style="text-align: right;">${financialData.orderStats.total > 0 ? 
-                ((financialData.orderStats.completed / financialData.orderStats.total) * 100).toFixed(1) : 0}%</td>
-            </tr>
-            <tr>
-              <td>🔄 Processing</td>
-              <td style="text-align: right;">${financialData.orderStats.processing}</td>
-              <td style="text-align: right;">${financialData.orderStats.total > 0 ? 
-                ((financialData.orderStats.processing / financialData.orderStats.total) * 100).toFixed(1) : 0}%</td>
-            </tr>
-            <tr>
-              <td>⏳ Pending</td>
-              <td style="text-align: right;">${financialData.orderStats.pending}</td>
-              <td style="text-align: right;">${financialData.orderStats.total > 0 ? 
-                ((financialData.orderStats.pending / financialData.orderStats.total) * 100).toFixed(1) : 0}%</td>
-            </tr>
-            <tr>
-              <td>❌ Cancelled</td>
-              <td style="text-align: right;">${financialData.orderStats.cancelled}</td>
-              <td style="text-align: right;">${financialData.orderStats.total > 0 ? 
-                ((financialData.orderStats.cancelled / financialData.orderStats.total) * 100).toFixed(1) : 0}%</td>
-            </tr>
-            <tr>
-              <td>↩️ Returned</td>
-              <td style="text-align: right;">${financialData.orderStats.returned}</td>
-              <td style="text-align: right;">${financialData.orderStats.total > 0 ? 
-                ((financialData.orderStats.returned / financialData.orderStats.total) * 100).toFixed(1) : 0}%</td>
-            </tr>
-          </tbody>
-        </table>
-
-        ${financialData.topProducts.length > 0 ? `
-          <h2>🏆 Top Selling Products</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Product Name</th>
-                <th style="text-align: right;">Quantity Sold</th>
-                <th style="text-align: right;">Revenue</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${financialData.topProducts.map((product, index) => `
+            <h3>Order Statistics</h3>
+            <table>
+              <thead>
                 <tr>
-                  <td><strong>#${index + 1}</strong></td>
-                  <td>${product.name}</td>
-                  <td style="text-align: right;">${product.quantity}</td>
-                  <td style="text-align: right; color: #f97316; font-weight: 600;">${formatCurrency(product.revenue)}</td>
+                  <th>Status</th>
+                  <th style="text-align: right;">Count</th>
+                  <th style="text-align: right;">Percentage</th>
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        ` : '<p style="color: #6b7280; font-style: italic;">No product sales data available for this period.</p>'}
-
-        ${financialData.monthlyRevenue.length > 0 ? `
-          <h2>📈 Monthly Revenue Breakdown</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Month</th>
-                <th style="text-align: right;">Revenue</th>
-                <th style="text-align: right;">% of Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${financialData.monthlyRevenue.map(item => `
+              </thead>
+              <tbody>
+                <tr style="background: #f0fdf4;">
+                  <td><strong>Total Orders</strong></td>
+                  <td style="text-align: right;"><strong>${financialData.orderStats.total}</strong></td>
+                  <td style="text-align: right;"><strong>100%</strong></td>
+                </tr>
                 <tr>
-                  <td>${item.month}</td>
-                  <td style="text-align: right; font-weight: 600;">${formatCurrency(item.amount)}</td>
-                  <td style="text-align: right;">${financialData.totalRevenue > 0 ? 
-                    ((item.amount / financialData.totalRevenue) * 100).toFixed(1) : 0}%</td>
+                  <td>Completed</td>
+                  <td style="text-align: right;">${financialData.orderStats.completed}</td>
+                  <td style="text-align: right;">${financialData.orderStats.total > 0 ? 
+                    ((financialData.orderStats.completed / financialData.orderStats.total) * 100).toFixed(1) : 0}%</td>
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        ` : ''}
-
-        <div class="footer">
-          <p><strong>Finance Analytics System</strong></p>
-          <p>This report was automatically generated and contains confidential financial information.</p>
-          <p>Platform Commission Rate: 4% | Seller Payout Rate: 96%</p>
-          <p style="margin-top: 15px; font-size: 11px;">© ${new Date().getFullYear()} All rights reserved.</p>
+                <tr>
+                  <td>Processing</td>
+                  <td style="text-align: right;">${financialData.orderStats.processing}</td>
+                  <td style="text-align: right;">${financialData.orderStats.total > 0 ? 
+                    ((financialData.orderStats.processing / financialData.orderStats.total) * 100).toFixed(1) : 0}%</td>
+                </tr>
+                <tr>
+                  <td>Pending</td>
+                  <td style="text-align: right;">${financialData.orderStats.pending}</td>
+                  <td style="text-align: right;">${financialData.orderStats.total > 0 ? 
+                    ((financialData.orderStats.pending / financialData.orderStats.total) * 100).toFixed(1) : 0}%</td>
+                </tr>
+                <tr>
+                  <td>Cancelled</td>
+                  <td style="text-align: right;">${financialData.orderStats.cancelled}</td>
+                  <td style="text-align: right;">${financialData.orderStats.total > 0 ? 
+                    ((financialData.orderStats.cancelled / financialData.orderStats.total) * 100).toFixed(1) : 0}%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Footer -->
+          <div class="footer">
+            <div class="footer-content">
+              <div class="footer-left">
+                <div class="admin-info">Downloaded by: <strong>${adminName}</strong></div>
+                <div class="admin-info">${adminEmail}</div>
+              </div>
+              <div class="footer-center">
+                <div class="page-number">© ${new Date().getFullYear()} Aruviah - Confidential</div>
+              </div>
+              <div class="footer-right">
+                <div class="page-number">Report #ARV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </body>
       </html>

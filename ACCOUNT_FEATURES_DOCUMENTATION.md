@@ -1,7 +1,7 @@
 # User Account Management Features - Documentation
 
 ## Overview
-I've added comprehensive account management features to your Shopki e-commerce application. The user profile section now includes four main tabs with multiple features for users to manage their accounts securely and customize their experience.
+I've added comprehensive account management features to your Aruviah e-commerce application. The user profile section now includes four main tabs with multiple features for users to manage their accounts securely and customize their experience.
 
 ---
 

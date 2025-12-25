@@ -1,6 +1,6 @@
 # Shopki Email API Server
 
-Backend service for sending transactional emails via SendGrid in the Shopki e-commerce platform.
+Backend service for sending transactional emails via SendGrid in the Aruviah e-commerce platform.
 
 ## Features
 

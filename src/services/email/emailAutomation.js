@@ -37,7 +37,7 @@ export const sendAccountConfirmationEmail = async (email, displayName, confirmat
     } else {
       // Fallback to default template if admin template not configured
       htmlContent = `
-        <h2>Welcome to Shopki, ${displayName}!</h2>
+        <h2>Welcome to Aruviah, ${displayName}!</h2>
         <p>Your account has been created successfully.</p>
         ${confirmationLink ? `
         <p>To verify your email address, click the button below:</p>
@@ -46,20 +46,20 @@ export const sendAccountConfirmationEmail = async (email, displayName, confirmat
         </a>
         <p style="color: #666; font-size: 12px;">This link expires in 24 hours.</p>
         ` : `
-        <p>Your email has been verified. You can now enjoy all Shopki features.</p>
+        <p>Your email has been verified. You can now enjoy all Aruviah features.</p>
         `}
         <p>If you didn't create this account, please ignore this email.</p>
         <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
         <p style="color: #666; font-size: 12px;">
-          Shopki Team<br>
-          We're here to help at support@shopki.com
+          Aruviah Team<br>
+          We're here to help at support@aruviah.com
         </p>
       `;
     }
 
     const result = await sendTransactionalEmail({
       email,
-      subject: 'Welcome to Shopki! Verify Your Email',
+      subject: 'Welcome to Aruviah! Verify Your Email',
       htmlContent
     });
 
@@ -84,26 +84,47 @@ export const sendAccountConfirmationEmail = async (email, displayName, confirmat
  */
 export const sendNewsletterConfirmation = async (email, displayName) => {
   try {
-    const htmlContent = `
-      <h2>Thank You for Subscribing!</h2>
-      <p>Hi ${displayName},</p>
-      <p>You've successfully subscribed to the Shopki newsletter.</p>
-      <p>You'll receive:</p>
-      <ul>
-        <li>🎁 Exclusive deals and promotions</li>
-        <li>📦 New product arrivals</li>
-        <li>💝 Special offers for subscribers</li>
-        <li>📚 Shopping tips and trends</li>
-      </ul>
-      <p style="margin-top: 20px;">Manage your preferences anytime in your account settings.</p>
-      <p style="color: #666; font-size: 12px; margin-top: 20px;">
-        © ${new Date().getFullYear()} Shopki. All rights reserved.
-      </p>
-    `;
+    // Fetch the newsletter email template from admin settings
+    const template = await getEmailTemplate('newsletter');
+    
+    let htmlContent;
+    let subject = 'Welcome to Aruviah Newsletter!';
+
+    if (template && template.htmlContent) {
+      // Use admin-configured template with variable replacement
+      const variables = {
+        displayName: displayName || 'Subscriber',
+        email: email,
+        unsubscribeLink: `${process.env.REACT_APP_BASE_URL}/unsubscribe?email=${encodeURIComponent(email)}`,
+        currentYear: new Date().getFullYear()
+      };
+      htmlContent = replaceTemplateVariables(template.htmlContent, variables);
+      if (template.subject) {
+        subject = template.subject;
+      }
+    } else {
+      // Fallback to default template
+      htmlContent = `
+        <h2>Thank You for Subscribing!</h2>
+        <p>Hi ${displayName},</p>
+        <p>You've successfully subscribed to the Aruviah newsletter.</p>
+        <p>You'll receive:</p>
+        <ul>
+          <li>🎁 Exclusive deals and promotions</li>
+          <li>📦 New product arrivals</li>
+          <li>💝 Special offers for subscribers</li>
+          <li>📚 Shopping tips and trends</li>
+        </ul>
+        <p style="margin-top: 20px;">Manage your preferences anytime in your account settings.</p>
+        <p style="color: #666; font-size: 12px; margin-top: 20px;">
+          © ${new Date().getFullYear()} Aruviah. All rights reserved.
+        </p>
+      `;
+    }
 
     const result = await sendTransactionalEmail({
       email,
-      subject: 'Welcome to Shopki Newsletter!',
+      subject,
       htmlContent
     });
 
@@ -315,6 +336,175 @@ export const registerForNewsletter = async (email, displayName) => {
   }
 };
 
+/**
+ * Send vendor application approved email
+ * @param {string} email - User email
+ * @param {string} displayName - User name
+ * @param {string} businessName - Vendor business name
+ * @returns {Promise}
+ */
+export const sendVendorApprovedEmail = async (email, displayName, businessName) => {
+  try {
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #ff9800;">🎉 Welcome to Aruviah Vendor Program!</h2>
+        
+        <p>Hi ${displayName},</p>
+        
+        <p>Great news! Your vendor application for <strong>${businessName}</strong> has been <strong style="color: #28a745;">APPROVED</strong>!</p>
+        
+        <p>You can now access the vendor dashboard to:</p>
+        <ul style="color: #555; line-height: 1.8;">
+          <li>📦 Post and manage your products</li>
+          <li>📊 View sales analytics and reports</li>
+          <li>🛒 Manage customer orders</li>
+          <li>💰 Track your revenue</li>
+          <li>⚙️ Update your business information</li>
+        </ul>
+        
+        <p style="margin-top: 20px;">
+          <a href="${process.env.REACT_APP_SITE_URL || 'https://localhost:3000'}/vendor/dashboard" 
+             style="background-color: #ff9800; color: white; padding: 12px 30px; text-decoration: none; border-radius: 4px; display: inline-block;">
+            Go to Vendor Dashboard
+          </a>
+        </p>
+        
+        <p style="margin-top: 20px; color: #666; font-size: 14px;">
+          If you have any questions, please contact our vendor support team.
+        </p>
+        
+        <p style="color: #999; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+          Best regards,<br/>
+          <strong>Aruviah Vendor Team</strong><br/>
+          ${new Date().getFullYear()}
+        </p>
+      </div>
+    `;
+
+    return await sendTransactionalEmail({
+      email,
+      subject: `🎉 Vendor Application Approved - ${businessName}`,
+      htmlContent,
+      senderName: 'Aruviah Vendor Team'
+    });
+  } catch (error) {
+    console.error('Error sending vendor approved email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Send vendor application rejected email
+ * @param {string} email - User email
+ * @param {string} displayName - User name
+ * @param {string} businessName - Vendor business name
+ * @param {string} rejectionReason - Reason for rejection
+ * @returns {Promise}
+ */
+export const sendVendorRejectedEmail = async (email, displayName, businessName, rejectionReason) => {
+  try {
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #dc3545;">Application Review Decision</h2>
+        
+        <p>Hi ${displayName},</p>
+        
+        <p>Thank you for applying to become an Aruviah vendor. After careful review, we have decided to <strong style="color: #dc3545;">not approve</strong> your application at this time.</p>
+        
+        <h3 style="color: #333; margin-top: 20px;">Reason for Decision:</h3>
+        <p style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #dc3545; color: #555;">
+          ${rejectionReason || 'Thank you for your interest in our vendor program.'}
+        </p>
+        
+        <h3 style="color: #333; margin-top: 20px;">What's Next?</h3>
+        <p>We encourage you to:</p>
+        <ul style="color: #555; line-height: 1.8;">
+          <li>Review the feedback provided above</li>
+          <li>Make any necessary improvements to your business documentation</li>
+          <li>Reapply in 30 days if you feel you've addressed the concerns</li>
+        </ul>
+        
+        <p style="margin-top: 20px;">
+          <a href="${process.env.REACT_APP_SITE_URL || 'https://localhost:3000'}/vendor-signup" 
+             style="background-color: #ff9800; color: white; padding: 12px 30px; text-decoration: none; border-radius: 4px; display: inline-block;">
+            Learn More About Our Vendor Program
+          </a>
+        </p>
+        
+        <p style="margin-top: 20px; color: #666; font-size: 14px;">
+          If you have questions about this decision, please contact our vendor support team.
+        </p>
+        
+        <p style="color: #999; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+          Best regards,<br/>
+          <strong>Aruviah Vendor Team</strong><br/>
+          ${new Date().getFullYear()}
+        </p>
+      </div>
+    `;
+
+    return await sendTransactionalEmail({
+      email,
+      subject: `Application Review - ${businessName}`,
+      htmlContent,
+      senderName: 'Aruviah Vendor Team'
+    });
+  } catch (error) {
+    console.error('Error sending vendor rejected email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Send vendor application received confirmation email
+ * @param {string} email - User email
+ * @param {string} displayName - User name
+ * @param {string} businessName - Vendor business name
+ * @returns {Promise}
+ */
+export const sendVendorApplicationReceivedEmail = async (email, displayName, businessName) => {
+  try {
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #ff9800;">✓ Application Received</h2>
+        
+        <p>Hi ${displayName},</p>
+        
+        <p>Thank you for submitting your vendor application for <strong>${businessName}</strong>!</p>
+        
+        <p>We have received your application and it is now under review. Our vendor team will carefully evaluate your submission.</p>
+        
+        <h3 style="color: #333; margin-top: 20px;">What to Expect:</h3>
+        <ul style="color: #555; line-height: 1.8;">
+          <li>⏱️ Review typically takes 3-5 business days</li>
+          <li>📧 You will receive an email with the decision</li>
+          <li>📞 We may contact you for additional information if needed</li>
+        </ul>
+        
+        <p style="margin-top: 20px; color: #666; font-size: 14px;">
+          You can check the status of your application at any time by logging into your account.
+        </p>
+        
+        <p style="color: #999; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+          Best regards,<br/>
+          <strong>Aruviah Vendor Team</strong><br/>
+          ${new Date().getFullYear()}
+        </p>
+      </div>
+    `;
+
+    return await sendTransactionalEmail({
+      email,
+      subject: `✓ Vendor Application Received - ${businessName}`,
+      htmlContent,
+      senderName: 'Aruviah Vendor Team'
+    });
+  } catch (error) {
+    console.error('Error sending vendor application received email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 export default {
   sendAccountConfirmationEmail,
   sendNewsletterConfirmation,
@@ -322,5 +512,8 @@ export default {
   sendOrderStatusUpdate,
   sendPromotionalEmail,
   sendAbandonedCartEmail,
-  registerForNewsletter
+  registerForNewsletter,
+  sendVendorApprovedEmail,
+  sendVendorRejectedEmail,
+  sendVendorApplicationReceivedEmail
 };

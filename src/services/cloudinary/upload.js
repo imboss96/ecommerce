@@ -62,7 +62,7 @@ export const uploadImage = async (file) => {
 };
 
 // Upload with folder and custom options
-export const uploadToCloudinary = async (file, folder = 'shopki') => {
+export const uploadToCloudinary = async (file, folder = 'aruviah') => {
   try {
     if (!CLOUD_NAME || !UPLOAD_PRESET) {
       throw new Error('Cloudinary credentials not configured. Check .env file.');

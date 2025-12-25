@@ -29,15 +29,33 @@
   margin-bottom: 10px;
 }
 
+.newsletter-compact-fields {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  min-width: 300px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .newsletter-compact-input {
   padding: 12px 16px;
   border: none;
   border-radius: 4px;
   font-size: 14px;
-  width: 100%;
-  max-width: 350px;
   outline: none;
   transition: all 0.3s ease;
+}
+
+.newsletter-compact-fields .newsletter-compact-input {
+  flex: 1;
+  min-width: 100px;
+  max-width: 200px;
+}
+
+.newsletter-compact-form > .newsletter-compact-input {
+  width: 100%;
+  max-width: 350px;
 }
 
 .newsletter-compact-input:focus {
@@ -158,11 +176,13 @@
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
-  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .newsletter-input {
   flex: 1;
+  min-width: 120px;
   padding: 14px 18px;
   border: none;
   border-radius: 4px;
@@ -194,6 +214,7 @@
   align-items: center;
   gap: 8px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .newsletter-button:hover:not(:disabled) {

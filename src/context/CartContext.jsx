@@ -21,16 +21,33 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
   const addToCart = (product) => {
+    // Validate stock before adding
+    if (!product.stock || product.stock <= 0) {
+      console.warn('❌ Product out of stock:', product.name);
+      return { success: false, error: 'Product is out of stock' };
+    }
+
     const existingItem = cartItems.find(item => item.id === product.id);
+    
     if (existingItem) {
+      // Check if adding another would exceed stock
+      const newQuantity = existingItem.quantity + 1;
+      if (newQuantity > product.stock) {
+        console.warn(`❌ Cannot add more of ${product.name}. Available: ${product.stock}, Requested: ${newQuantity}`);
+        return { success: false, error: `Only ${product.stock} ${product.name}(s) available in stock` };
+      }
+      
       setCartItems(cartItems.map(item => 
         item.id === product.id 
-          ? { ...item, quantity: item.quantity + 1 }
+          ? { ...item, quantity: newQuantity }
           : item
       ));
     } else {
       setCartItems([...cartItems, { ...product, quantity: 1 }]);
     }
+    
+    console.log('✅ Added to cart:', product.name);
+    return { success: true };
   };
 
   const removeFromCart = (productId) => {
@@ -41,6 +58,14 @@ export const CartProvider = ({ children }) => {
     setCartItems(cartItems.map(item => {
       if (item.id === productId) {
         const newQuantity = item.quantity + change;
+        
+        // Validate stock before updating
+        if (newQuantity > 0 && item.stock && newQuantity > item.stock) {
+          console.warn(`❌ Cannot increase quantity. Max available: ${item.stock}`);
+          // Don't change quantity, return original item
+          return item;
+        }
+        
         return newQuantity > 0 ? { ...item, quantity: newQuantity } : item;
       }
       return item;

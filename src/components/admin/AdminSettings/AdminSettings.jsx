@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { FiSettings, FiMail, FiUsers, FiShoppingCart } from 'react-icons/fi';
 import { useLogoSettings } from '../../../hooks/useLogoSettings';
 import { uploadToCloudinary } from '../../../services/cloudinary/upload';
 import EmailTemplateEditor from '../EmailTemplateEditor/EmailTemplateEditor';
+import NewsletterSubscribers from '../Newsletter/NewsletterSubscribers';
+import VendorApplications from '../vendor/VendorApplications';
 import './AdminSettings.css';
 
 const AdminSettings = () => {
@@ -10,7 +13,7 @@ const AdminSettings = () => {
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('branding'); // 'branding' or 'email'
+  const [activeTab, setActiveTab] = useState('branding'); // 'branding', 'email', 'newsletter', or 'vendors'
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
@@ -40,7 +43,7 @@ const AdminSettings = () => {
       reader.readAsDataURL(file);
 
       // Upload to Cloudinary
-      const cloudinaryUrl = await uploadToCloudinary(file, 'shopki_logo');
+      const cloudinaryUrl = await uploadToCloudinary(file, 'aruviah_logo');
       
       // Update Firestore
       const result = await updateLogo(cloudinaryUrl);
@@ -67,20 +70,32 @@ const AdminSettings = () => {
           className={`settings-tab ${activeTab === 'branding' ? 'active' : ''}`}
           onClick={() => setActiveTab('branding')}
         >
-          🎨 Branding
+          <FiSettings size={18} /> Branding
         </button>
         <button 
           className={`settings-tab ${activeTab === 'email' ? 'active' : ''}`}
           onClick={() => setActiveTab('email')}
         >
-          📧 Email Templates
+          <FiMail size={18} /> Email Templates
+        </button>
+        <button 
+          className={`settings-tab ${activeTab === 'newsletter' ? 'active' : ''}`}
+          onClick={() => setActiveTab('newsletter')}
+        >
+          <FiUsers size={18} /> Newsletter
+        </button>
+        <button 
+          className={`settings-tab ${activeTab === 'vendors' ? 'active' : ''}`}
+          onClick={() => setActiveTab('vendors')}
+        >
+          <FiShoppingCart size={18} /> Vendor Apps
         </button>
       </div>
 
       {/* Branding Tab */}
       {activeTab === 'branding' && (
         <div className="settings-card">
-          <h2 className="settings-title">🎨 Branding Settings</h2>
+          <h2 className="settings-title"><FiSettings size={24} style={{marginRight: '12px', display: 'inline'}} /> Branding Settings</h2>
           <p className="settings-subtitle">Manage your store's logo and branding</p>
 
           <div className="logo-section">
@@ -159,6 +174,16 @@ const AdminSettings = () => {
       {/* Email Templates Tab */}
       {activeTab === 'email' && (
         <EmailTemplateEditor />
+      )}
+
+      {/* Newsletter Subscribers Tab */}
+      {activeTab === 'newsletter' && (
+        <NewsletterSubscribers />
+      )}
+
+      {/* Vendor Applications Tab */}
+      {activeTab === 'vendors' && (
+        <VendorApplications />
       )}
     </div>
   );

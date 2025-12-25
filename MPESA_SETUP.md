@@ -1,7 +1,7 @@
 # M-Pesa Payment Integration Setup Guide
 
 ## Overview
-This guide will help you integrate M-Pesa payments (STK Push) into your Shopki e-commerce platform. M-Pesa STK Push is a secure payment method that sends a prompt directly to customers' phones.
+This guide will help you integrate M-Pesa payments (STK Push) into your Aruviah e-commerce platform. M-Pesa STK Push is a secure payment method that sends a prompt directly to customers' phones.
 
 ## Prerequisites
 - Shopki backend running (Node.js/Express)
@@ -13,7 +13,7 @@ This guide will help you integrate M-Pesa payments (STK Push) into your Shopki e
 ### From Safaricom
 1. Go to [Safaricom Developer Portal](https://developer.safaricom.co.ke/)
 2. Sign up or log in to your account
-3. Create a new app for your Shopki e-commerce platform
+3. Create a new app for your Aruviah e-commerce platform
 4. You'll receive:
    - **Consumer Key**
    - **Consumer Secret**

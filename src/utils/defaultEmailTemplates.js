@@ -297,5 +297,169 @@ export const DEFAULT_EMAIL_TEMPLATES = {
         </body>
       </html>
     `
+  },
+
+  orderConfirmation: {
+    subject: '✅ Order Confirmed - {{orderNumber}}',
+    htmlContent: `
+      <h2>Order Confirmation</h2>
+      <p>Thank you for your order!</p>
+      <p><strong>Order #:</strong> {{orderNumber}}</p>
+      <p><strong>Order Date:</strong> {{orderDate}}</p>
+      <p><strong>Total:</strong> {{total}}</p>
+      <p>We're preparing your items for shipment.</p>
+      <a href="{{trackingUrl}}" style="background-color: #ff9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Track Your Order</a>
+    `
+  },
+
+  orderStatus: {
+    subject: '📊 Order Status Update - {{orderNumber}}',
+    htmlContent: `
+      <h2>Order Status Updated</h2>
+      <p>Your order status has been updated!</p>
+      <p><strong>Order #:</strong> {{orderNumber}}</p>
+      <p><strong>Status:</strong> {{status}}</p>
+      <p>{{statusMessage}}</p>
+      {{trackingNumber}}
+      <a href="{{trackingUrl}}" style="background-color: #ff9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">View Details</a>
+    `
+  },
+
+  orderPending: {
+    subject: '⏳ Order Pending - {{orderNumber}}',
+    htmlContent: `
+      <h2>Your Order is Pending</h2>
+      <p>We've received your order and are preparing it for processing.</p>
+      <p><strong>Order #:</strong> {{orderNumber}}</p>
+      <p><strong>Order Date:</strong> {{orderDate}}</p>
+      <p><strong>Total:</strong> {{total}}</p>
+      <p>We'll notify you when your order moves to the next stage.</p>
+      <a href="{{trackingUrl}}" style="background-color: #ff9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Track Order</a>
+    `
+  },
+
+  orderProcessing: {
+    subject: '🔄 Order Processing - {{orderNumber}}',
+    htmlContent: `
+      <h2>Your Order is Being Processed</h2>
+      <p>Your order is now being processed and packed.</p>
+      <p><strong>Order #:</strong> {{orderNumber}}</p>
+      <p>{{items}}</p>
+      <p>You'll receive a shipping notification with tracking details very soon!</p>
+      <a href="{{trackingUrl}}" style="background-color: #ff9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Track Order</a>
+    `
+  },
+
+  orderShipped: {
+    subject: '🚚 Your Order Has Shipped! - {{orderNumber}}',
+    htmlContent: `
+      <h2>Your Order is On the Way!</h2>
+      <p>Great news! Your order has been shipped.</p>
+      <p><strong>Order #:</strong> {{orderNumber}}</p>
+      <p><strong>Tracking Number:</strong> {{trackingNumber}}</p>
+      <p><strong>Estimated Delivery:</strong> {{estimatedDelivery}}</p>
+      <p>Click below to track your shipment in real-time.</p>
+      <a href="{{trackingUrl}}" style="background-color: #ff9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Track Shipment</a>
+    `
+  },
+
+  orderCompleted: {
+    subject: '✅ Order Delivered - {{orderNumber}}',
+    htmlContent: `
+      <h2>Your Order Has Been Delivered!</h2>
+      <p>We're excited to let you know that your order has arrived!</p>
+      <p><strong>Order #:</strong> {{orderNumber}}</p>
+      <p>We hope you enjoy your purchase. If you have any questions or concerns, please don't hesitate to reach out.</p>
+      <p><a href="{{trackingUrl}}" style="color: #ff9800;">View your order details</a></p>
+      <p>Thank you for shopping with us!</p>
+    `
+  },
+
+  orderCancelled: {
+    subject: '❌ Order Cancelled - {{orderNumber}}',
+    htmlContent: `
+      <h2>Order Cancellation Notice</h2>
+      <p>Your order has been cancelled.</p>
+      <p><strong>Order #:</strong> {{orderNumber}}</p>
+      <p>{{statusMessage}}</p>
+      <p>If you have any questions about this cancellation, please contact our support team.</p>
+      <a href="{{trackingUrl}}" style="background-color: #ff9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">View Order</a>
+    `
+  },
+
+  orderReturned: {
+    subject: '↩️ Order Return Processed - {{orderNumber}}',
+    htmlContent: `
+      <h2>Your Return Has Been Processed</h2>
+      <p>We've received and processed your return.</p>
+      <p><strong>Order #:</strong> {{orderNumber}}</p>
+      <p>{{statusMessage}}</p>
+      <p>Your refund will be processed within 5-7 business days.</p>
+      <a href="{{trackingUrl}}" style="background-color: #ff9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">View Return Status</a>
+    `
+  },
+
+  newsletter: {
+    subject: '🎉 Welcome to the Aruviah Newsletter!',
+    htmlContent: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+            .header { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; padding: 30px 20px; text-align: center; }
+            .content { padding: 40px 30px; }
+            .benefit-box { background: #f0f7ff; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #2196F3; }
+            .cta-button { display: inline-block; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; text-align: center; }
+            .footer { background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eee; font-size: 12px; color: #888; }
+            .unsubscribe { text-align: center; margin-top: 10px; font-size: 11px; }
+            .unsubscribe a { color: #0066cc; text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🎉 Welcome to Aruviah!</h1>
+              <p>You're now subscribed to exclusive deals and updates</p>
+            </div>
+            <div class="content">
+              <p>Hello {{displayName}},</p>
+              <p>Thank you for subscribing to our newsletter! We're excited to have you on our growing community of smart shoppers.</p>
+              
+              <div class="benefit-box">
+                <h3 style="margin-top: 0;">✨ Here's what you'll get:</h3>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                  <li>Exclusive discounts and early access to sales</li>
+                  <li>New product launches and trending items</li>
+                  <li>Special promotions just for subscribers</li>
+                  <li>Tips and recommendations curated for you</li>
+                  <li>Updates on the latest arrivals in your favorite categories</li>
+                </ul>
+              </div>
+
+              <p>Our newsletter is packed with valuable content, so keep an eye on your inbox. We send updates every week with the best deals, new arrivals, and exclusive offers.</p>
+
+              <p style="text-align: center;">
+                <a href="https://aruviah.com" class="cta-button">Visit Our Store</a>
+              </p>
+
+              <p>If you have any questions or feedback, feel free to reach out to us at support@aruviah.com</p>
+
+              <p>Happy shopping!<br><strong>The Aruviah Team</strong></p>
+            </div>
+            <div class="footer">
+              <p>© 2025 Aruviah. All rights reserved.</p>
+              <p>Registered in Kenya | East African E-commerce Platform</p>
+              <div class="unsubscribe">
+                <p><a href="{{unsubscribeLink}}">Manage your subscription preferences</a></p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `
   }
 };

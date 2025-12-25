@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiX, FiMail, FiLock, FiUser, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiX, FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiSmartphone } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../context/AuthContext';
 import ForgotPassword from './ForgotPassword/ForgotPassword';
+import PhoneAuthForm from './PhoneAuthForm';
 
 const AuthModal = ({ isOpen, onClose, defaultView = 'login' }) => {
   const navigate = useNavigate();
@@ -194,6 +195,14 @@ const AuthModal = ({ isOpen, onClose, defaultView = 'login' }) => {
               <FcGoogle size={20} />
               <span>Continue with Google</span>
             </button>
+            <button
+              onClick={() => setView('phone')}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 border border-blue-300 py-3 rounded-lg hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+            >
+              <FiSmartphone size={20} className="text-blue-600" />
+              <span className="text-blue-600 font-medium">Continue with Phone</span>
+            </button>
             <p className="text-center mt-6 text-gray-600">
               Don't have an account?{' '}
               <button onClick={() => setView('signup')} className="text-orange-500 hover:underline font-semibold">
@@ -299,6 +308,14 @@ const AuthModal = ({ isOpen, onClose, defaultView = 'login' }) => {
               <FcGoogle size={20} />
               <span>Continue with Google</span>
             </button>
+            <button
+              onClick={() => setView('phone')}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 border border-blue-300 py-3 rounded-lg hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+            >
+              <FiSmartphone size={20} className="text-blue-600" />
+              <span className="text-blue-600 font-medium">Continue with Phone</span>
+            </button>
             <p className="text-center mt-6 text-gray-600">
               Already have an account?{' '}
               <button onClick={() => setView('login')} className="text-orange-500 hover:underline font-semibold">
@@ -316,6 +333,17 @@ const AuthModal = ({ isOpen, onClose, defaultView = 'login' }) => {
                 setView('login');
                 onClose();
               }}
+            />
+          </div>
+        )}
+
+        {view === 'phone' && (
+          <div>
+            <PhoneAuthForm 
+              onSuccess={(user, userData) => {
+                onClose();
+              }}
+              onClose={() => setView('login')}
             />
           </div>
         )}

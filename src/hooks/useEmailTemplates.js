@@ -4,7 +4,19 @@ import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { DEFAULT_EMAIL_TEMPLATES } from '../utils/defaultEmailTemplates';
 
 const TEMPLATES_COLLECTION = 'emailTemplates';
-const EMAIL_TYPES = ['passwordReset', 'welcomeEmail', 'orderPlaced', 'orderConfirmed', 'orderShipped', 'orderCancelled'];
+const EMAIL_TYPES = [
+  'passwordReset',
+  'welcome',
+  'orderConfirmation',
+  'orderStatus',
+  'orderPending',
+  'orderProcessing',
+  'orderShipped',
+  'orderCompleted',
+  'orderCancelled',
+  'orderReturned',
+  'newsletter'
+];
 
 const useEmailTemplates = () => {
   const [templates, setTemplates] = useState({});

@@ -17,6 +17,10 @@ export const sendOrderStatusEmail = async (userEmail, userName, orderId, newStat
         subject: 'Order Confirmed - Pending Processing',
         message: 'Your order has been confirmed and is pending processing.'
       },
+      confirmed: {
+        subject: 'Order Confirmed',
+        message: 'Your order has been confirmed by the vendor and will be processed soon.'
+      },
       processing: {
         subject: 'Order Processing',
         message: 'Your order is now being processed and will be shipped soon.'
@@ -98,7 +102,7 @@ export const sendOrderStatusEmail = async (userEmail, userName, orderId, newStat
         <body>
           <div class="container">
             <div class="header">
-              <h1>Shopki Order Update</h1>
+              <h1>Aruviah Order Update</h1>
             </div>
             
             <div class="content">
@@ -127,7 +131,7 @@ export const sendOrderStatusEmail = async (userEmail, userName, orderId, newStat
               </table>
               
               <p style="margin-top: 20px;">
-                <a href="https://shopki.com/orders" class="button">Track Your Order</a>
+                <a href="https://aruviah.com/orders" class="button">Track Your Order</a>
               </p>
               
               <p style="color: #666; font-size: 14px; margin-top: 20px;">
@@ -136,9 +140,9 @@ export const sendOrderStatusEmail = async (userEmail, userName, orderId, newStat
             </div>
             
             <div class="footer">
-              <p>Thank you for shopping with Shopki!</p>
-              <p>© 2025 Shopki. All rights reserved.</p>
-              <p>support@shopki.com</p>
+              <p>Thank you for shopping with Aruviah!</p>
+              <p>© 2025 Aruviah. All rights reserved.</p>
+              <p>support@aruviah.com</p>
             </div>
           </div>
         </body>
@@ -255,7 +259,7 @@ export const sendOrderConfirmationEmail = async (userEmail, userName, orderId, i
               </div>
               
               <p style="margin-top: 20px;">
-                <a href="https://shopki.com/orders" class="button">Track Your Order</a>
+                <a href="https://aruviah.com/orders" class="button">Track Your Order</a>
               </p>
               
               <p style="color: #666; font-size: 14px; margin-top: 20px;">

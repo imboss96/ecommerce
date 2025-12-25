@@ -1,11 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMinus, FiPlus, FiTrash2, FiArrowLeft } from 'react-icons/fi';
+import { FiMinus, FiPlus, FiTrash2, FiArrowLeft, FiAlertCircle } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
+import { toast } from 'react-toastify';
 
 const CartPage = () => {
   const navigate = useNavigate();
   const { cartItems, removeFromCart, updateQuantity, cartTotal, cartCount } = useCart();
+  const [stockWarnings, setStockWarnings] = useState({});
+
+  const handleQuantityChange = (itemId, change, maxStock) => {
+    const currentItem = cartItems.find(item => item.id === itemId);
+    const newQuantity = currentItem.quantity + change;
+    
+    // Validate against stock
+    if (newQuantity > maxStock) {
+      const warning = `Only ${maxStock} ${currentItem.name}(s) available in stock`;
+      setStockWarnings(prev => ({ ...prev, [itemId]: warning }));
+      toast.error(warning);
+      setTimeout(() => setStockWarnings(prev => {
+        const updated = { ...prev };
+        delete updated[itemId];
+        return updated;
+      }), 3000);
+      return;
+    }
+    
+    // Clear warning if valid
+    if (stockWarnings[itemId]) {
+      setStockWarnings(prev => {
+        const updated = { ...prev };
+        delete updated[itemId];
+        return updated;
+      });
+    }
+    
+    updateQuantity(itemId, change);
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -49,7 +80,9 @@ const CartPage = () => {
               {cartItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex gap-4 p-6 border-b last:border-b-0 hover:bg-gray-50 transition"
+                  className={`flex gap-4 p-6 border-b last:border-b-0 hover:bg-gray-50 transition ${
+                    stockWarnings[item.id] ? 'bg-red-50' : ''
+                  }`}
                 >
                   {/* Product Image */}
                   <div className="w-24 h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
@@ -73,6 +106,28 @@ const CartPage = () => {
                     <p className="text-gray-600 text-sm mt-1">
                       SKU: {item.id || 'N/A'}
                     </p>
+                    
+                    {/* Stock Info */}
+                    <div className="text-sm mt-2">
+                      {item.stock && item.stock > 0 ? (
+                        <p className="text-green-600 font-medium">
+                          ✅ In Stock ({item.stock} available)
+                        </p>
+                      ) : (
+                        <p className="text-red-600 font-medium">
+                          ❌ Out of Stock
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* Stock Warning */}
+                    {stockWarnings[item.id] && (
+                      <div className="flex items-center gap-2 mt-2 text-red-600 text-sm bg-red-50 p-2 rounded">
+                        <FiAlertCircle size={16} />
+                        {stockWarnings[item.id]}
+                      </div>
+                    )}
+                    
                     <p className="text-orange-500 font-bold text-lg mt-2">
                       KSh {(item.price * item.quantity).toLocaleString()}
                     </p>
@@ -81,7 +136,7 @@ const CartPage = () => {
                   {/* Quantity Controls */}
                   <div className="flex items-center gap-3 border rounded-lg px-3 py-2">
                     <button
-                      onClick={() => updateQuantity(item.id, -1)}
+                      onClick={() => handleQuantityChange(item.id, -1, item.stock)}
                       className="text-gray-600 hover:text-orange-500 transition"
                       title="Decrease quantity"
                     >
@@ -91,9 +146,14 @@ const CartPage = () => {
                       {item.quantity}
                     </span>
                     <button
-                      onClick={() => updateQuantity(item.id, 1)}
-                      className="text-gray-600 hover:text-orange-500 transition"
-                      title="Increase quantity"
+                      onClick={() => handleQuantityChange(item.id, 1, item.stock)}
+                      disabled={item.quantity >= (item.stock || 0)}
+                      className={`transition ${
+                        item.quantity >= (item.stock || 0)
+                          ? 'text-gray-300 cursor-not-allowed'
+                          : 'text-gray-600 hover:text-orange-500'
+                      }`}
+                      title={item.quantity >= (item.stock || 0) ? 'Maximum stock reached' : 'Increase quantity'}
                     >
                       <FiPlus />
                     </button>

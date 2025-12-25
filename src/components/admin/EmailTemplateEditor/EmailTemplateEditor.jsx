@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
+import { FiLock, FiUser, FiPackage, FiBarChart2, FiClock, FiRefreshCw, FiTruck, FiCheckCircle, FiXCircle, FiRotateCcw, FiMail } from 'react-icons/fi';
 import useEmailTemplates from '../../../hooks/useEmailTemplates';
 import './EmailTemplateEditor.css';
 
 const TEMPLATE_LABELS = {
-  passwordReset: '🔐 Password Reset',
-  welcomeEmail: '👋 Welcome Email',
-  orderPlaced: '📦 Order Placed',
-  orderConfirmed: '✅ Order Confirmed',
-  orderShipped: '🚚 Order Shipped',
-  orderCancelled: '❌ Order Cancelled'
+  passwordReset: [<FiLock key="icon" size={16} />, ' Password Reset'],
+  welcome: [<FiUser key="icon" size={16} />, ' Welcome Email'],
+  orderConfirmation: [<FiPackage key="icon" size={16} />, ' Order Confirmation'],
+  orderStatus: [<FiBarChart2 key="icon" size={16} />, ' Order Status Update'],
+  orderPending: [<FiClock key="icon" size={16} />, ' Order Pending'],
+  orderProcessing: [<FiRefreshCw key="icon" size={16} />, ' Order Processing'],
+  orderShipped: [<FiTruck key="icon" size={16} />, ' Order Shipped'],
+  orderCompleted: [<FiCheckCircle key="icon" size={16} />, ' Order Completed'],
+  orderCancelled: [<FiXCircle key="icon" size={16} />, ' Order Cancelled'],
+  orderReturned: [<FiRotateCcw key="icon" size={16} />, ' Order Returned'],
+  newsletter: [<FiMail key="icon" size={16} />, ' Newsletter']
 };
 
 const TEMPLATE_VARIABLES = {
@@ -17,34 +23,67 @@ const TEMPLATE_VARIABLES = {
     { label: 'Expiration Time', variable: '{{expirationTime}}' },
     { label: 'Email', variable: '{{email}}' }
   ],
-  welcomeEmail: [
-    { label: 'First Name', variable: '{{firstName}}' },
-    { label: 'Shop URL', variable: '{{shopUrl}}' }
+  welcome: [
+    { label: 'Display Name', variable: '{{displayName}}' },
+    { label: 'Email', variable: '{{email}}' },
+    { label: 'Confirmation Link', variable: '{{confirmationLink}}' },
+    { label: 'Current Year', variable: '{{currentYear}}' }
   ],
-  orderPlaced: [
-    { label: 'First Name', variable: '{{firstName}}' },
-    { label: 'Order ID', variable: '{{orderId}}' },
+  orderConfirmation: [
+    { label: 'Order Number', variable: '{{orderNumber}}' },
     { label: 'Order Date', variable: '{{orderDate}}' },
-    { label: 'Order Items', variable: '{{orderItems}}' },
-    { label: 'Order Total', variable: '{{orderTotal}}' }
+    { label: 'Items', variable: '{{items}}' },
+    { label: 'Subtotal', variable: '{{subtotal}}' },
+    { label: 'Total', variable: '{{total}}' },
+    { label: 'Shipping Fee', variable: '{{shippingFee}}' },
+    { label: 'Tracking URL', variable: '{{trackingUrl}}' },
+    { label: 'Current Year', variable: '{{currentYear}}' }
   ],
-  orderConfirmed: [
-    { label: 'First Name', variable: '{{firstName}}' },
-    { label: 'Order ID', variable: '{{orderId}}' },
-    { label: 'Order Tracking URL', variable: '{{orderTrackingUrl}}' }
+  orderStatus: [
+    { label: 'Order Number', variable: '{{orderNumber}}' },
+    { label: 'Status', variable: '{{status}}' },
+    { label: 'Status Message', variable: '{{statusMessage}}' },
+    { label: 'Tracking Number', variable: '{{trackingNumber}}' },
+    { label: 'Tracking URL', variable: '{{trackingUrl}}' },
+    { label: 'Current Year', variable: '{{currentYear}}' }
+  ],
+  orderPending: [
+    { label: 'Order Number', variable: '{{orderNumber}}' },
+    { label: 'Order Date', variable: '{{orderDate}}' },
+    { label: 'Total', variable: '{{total}}' },
+    { label: 'Tracking URL', variable: '{{trackingUrl}}' }
+  ],
+  orderProcessing: [
+    { label: 'Order Number', variable: '{{orderNumber}}' },
+    { label: 'Items', variable: '{{items}}' },
+    { label: 'Tracking URL', variable: '{{trackingUrl}}' }
   ],
   orderShipped: [
-    { label: 'First Name', variable: '{{firstName}}' },
-    { label: 'Order ID', variable: '{{orderId}}' },
+    { label: 'Order Number', variable: '{{orderNumber}}' },
     { label: 'Tracking Number', variable: '{{trackingNumber}}' },
     { label: 'Tracking URL', variable: '{{trackingUrl}}' },
     { label: 'Estimated Delivery', variable: '{{estimatedDelivery}}' }
   ],
+  orderCompleted: [
+    { label: 'Order Number', variable: '{{orderNumber}}' },
+    { label: 'Tracking URL', variable: '{{trackingUrl}}' },
+    { label: 'Current Year', variable: '{{currentYear}}' }
+  ],
   orderCancelled: [
-    { label: 'First Name', variable: '{{firstName}}' },
-    { label: 'Order ID', variable: '{{orderId}}' },
-    { label: 'Refund Amount', variable: '{{refundAmount}}' },
-    { label: 'Support URL', variable: '{{supportUrl}}' }
+    { label: 'Order Number', variable: '{{orderNumber}}' },
+    { label: 'Status Message', variable: '{{statusMessage}}' },
+    { label: 'Tracking URL', variable: '{{trackingUrl}}' }
+  ],
+  orderReturned: [
+    { label: 'Order Number', variable: '{{orderNumber}}' },
+    { label: 'Status Message', variable: '{{statusMessage}}' },
+    { label: 'Tracking URL', variable: '{{trackingUrl}}' }
+  ],
+  newsletter: [
+    { label: 'Display Name', variable: '{{displayName}}' },
+    { label: 'Email', variable: '{{email}}' },
+    { label: 'Unsubscribe Link', variable: '{{unsubscribeLink}}' },
+    { label: 'Current Year', variable: '{{currentYear}}' }
   ]
 };
 
@@ -129,7 +168,7 @@ const EmailTemplateEditor = () => {
 
   return (
     <div className="email-template-editor">
-      <h2>📧 Email Template Manager</h2>
+      <h2><FiMail size={24} style={{marginRight: '12px', display: 'inline'}} /> Email Template Manager</h2>
       
       {error && <div className="editor-alert editor-alert-error">{error}</div>}
       {message && <div className={`editor-alert editor-alert-${messageType}`}>{message}</div>}

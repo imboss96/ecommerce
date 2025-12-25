@@ -1,6 +1,6 @@
 # Admin Setup Guide
 
-This guide explains how to set up admin users in the Shopki e-commerce platform.
+This guide explains how to set up admin users in the Aruviah e-commerce platform.
 
 ## Overview
 

@@ -144,7 +144,7 @@ const EmailVerificationPage = () => {
             Thank you for verifying your email. Your account is now fully activated.
           </p>
           <button onClick={handleContinue} className="btn-primary">
-            Continue to Shopki
+            Continue to Aruviah
           </button>
         </div>
       </div>
@@ -168,11 +168,11 @@ const EmailVerificationPage = () => {
               </li>
               <li>
                 <span className="step-number">2</span>
-                <span className="step-text">Look for an email from "Shopki" or "noreply@firebaseapp.com"</span>
+                <span className="step-text">Look for an email from "Aruviah" or "noreply@firebaseapp.com"</span>
               </li>
               <li>
                 <span className="step-number">3</span>
-                <span className="step-text">Subject: "Verify your email for Shopki"</span>
+                <span className="step-text">Subject: "Verify your email for Aruviah"</span>
               </li>
               <li>
                 <span className="step-number">4</span>
@@ -180,7 +180,7 @@ const EmailVerificationPage = () => {
               </li>
               <li>
                 <span className="step-number">5</span>
-                <span className="step-text">You'll be redirected back to Shopki and verified!</span>
+                <span className="step-text">You'll be redirected back to Aruviah and verified!</span>
               </li>
             </ol>
           </div>
@@ -231,7 +231,7 @@ const EmailVerificationPage = () => {
           </div>
 
           <p className="footer-text">
-            You can continue browsing Shopki, but you'll need to verify your email before placing an order.
+            You can continue browsing Aruviah, but you'll need to verify your email before placing an order.
           </p>
         </div>
       </div>

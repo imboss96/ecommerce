@@ -1,7 +1,7 @@
 # HTML-Based Alerts Implementation Complete ✅
 
 ## Overview
-All browser-based `alert()` functions have been replaced with **HTML-based notifications** throughout the Shopki application. Users now see beautiful, styled notification toasts instead of jarring browser popups.
+All browser-based `alert()` functions have been replaced with **HTML-based notifications** throughout the Aruviah application. Users now see beautiful, styled notification toasts instead of jarring browser popups.
 
 ## What Changed
 

@@ -4,19 +4,19 @@ const TermsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">SHOPKI TERMS AND CONDITIONS</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">ARUVIAH TERMS AND CONDITIONS</h1>
         <p className="text-gray-600 mb-8">Last Updated: November 2025</p>
 
         <div className="space-y-8 text-gray-700 leading-relaxed">
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction & Definitions</h2>
-            <p>Welcome to Shopki ("Platform", "Service", "we", "us", or "our"). These Terms and Conditions ("Terms") govern your access to and use of our e-commerce platform operating in Kenya and East Africa.</p>
+            <p>Welcome to Aruviah ("Platform", "Service", "we", "us", or "our"). These Terms and Conditions ("Terms") govern your access to and use of our e-commerce platform operating in Kenya and East Africa.</p>
             <p className="mt-4"><strong>Key Definitions:</strong></p>
             <ul className="list-disc list-inside space-y-2 mt-2">
               <li><strong>User:</strong> Any individual or entity accessing our platform</li>
               <li><strong>Buyer:</strong> Users who purchase products</li>
               <li><strong>Seller/Vendor:</strong> Users who list and sell products</li>
-              <li><strong>Platform:</strong> Shopki website and mobile application</li>
+              <li><strong>Platform:</strong> Aruviah website and mobile application</li>
               <li><strong>Content:</strong> Text, images, videos, product listings, reviews</li>
               <li><strong>Transaction:</strong> Purchase of products through our platform</li>
             </ul>
@@ -24,7 +24,7 @@ const TermsPage = () => {
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Eligibility</h2>
-            <p>By using Shopki, you represent and warrant that:</p>
+            <p>By using Aruviah, you represent and warrant that:</p>
             <ul className="list-disc list-inside space-y-2 mt-2">
               <li>You are at least 18 years old</li>
               <li>You are a resident of Kenya, Uganda, Tanzania, Rwanda, or other East African countries where we operate</li>

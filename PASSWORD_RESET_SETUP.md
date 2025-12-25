@@ -1,7 +1,7 @@
 # Password Reset Implementation Guide
 
 ## Overview
-Your Shopki application now has a complete password reset flow that allows users to reset their password using Firebase authentication.
+Your Aruviah application now has a complete password reset flow that allows users to reset their password using Firebase authentication.
 
 ## Components Created
 

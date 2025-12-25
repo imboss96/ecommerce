@@ -19,7 +19,7 @@ import NotificationBell from './NotificationBell';
 import './Header.css';
 
 const Header = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, userData, isAdmin } = useAuth();
   const { cartCount } = useCart();
   const { logo } = useLogoSettings();
   const navigate = useNavigate();
@@ -136,6 +136,18 @@ const Header = () => {
                         >
                           Wishlist
                         </Link>
+                        {userData?.isVendor && (
+                          <>
+                            <hr className="my-2" />
+                            <Link
+                              to="/vendor/dashboard"
+                              className="block px-4 py-2 hover:bg-gray-100 text-green-600 font-semibold"
+                              onClick={() => setUserMenuOpen(false)}
+                            >
+                              🏪 Vendor Dashboard
+                            </Link>
+                          </>
+                        )}
                         {isAdmin && (
                           <>
                             <hr className="my-2" />

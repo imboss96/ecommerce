@@ -4,24 +4,24 @@ const PrivacyPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">SHOPKI PRIVACY POLICY</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">ARUVIAH PRIVACY POLICY</h1>
         <p className="text-gray-600 mb-8">Last Updated: November 2025 | Effective Date: November 2025</p>
 
         <div className="space-y-8 text-gray-700 leading-relaxed">
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
-            <p>Welcome to Shopki. We are committed to protecting your privacy and personal data. This Privacy Policy explains how Shopki ("we," "us," or "our") collects, uses, stores, shares, and protects your personal information when you use our e-commerce platform, website, and mobile applications (collectively, the "Platform").</p>
+            <p>Welcome to Aruviah. We are committed to protecting your privacy and personal data. This Privacy Policy explains how Aruviah ("we," "us," or "our") collects, uses, stores, shares, and protects your personal information when you use our e-commerce platform, website, and mobile applications (collectively, the "Platform").</p>
             <p className="mt-4">This Privacy Policy complies with the Kenya Data Protection Act, 2019, and applicable laws in the East African Community (EAC).</p>
-            <p className="mt-4">By using Shopki, you consent to the practices described in this Privacy Policy. If you do not agree, please discontinue use of the Platform.</p>
+            <p className="mt-4">By using Aruviah, you consent to the practices described in this Privacy Policy. If you do not agree, please discontinue use of the Platform.</p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Data Controller Information</h2>
-            <p>Shopki is the Data Controller responsible for your personal data.</p>
+            <p>Aruviah is the Data Controller responsible for your personal data.</p>
             <div className="bg-gray-100 p-4 rounded mt-4 space-y-2">
-              <p><strong>Company Name:</strong> Shopki Limited</p>
+              <p><strong>Company Name:</strong> Aruviah Limited</p>
               <p><strong>Registered Address:</strong> Nairobi, Kenya</p>
-              <p><strong>Email:</strong> privacy@shopki.co.ke</p>
+              <p><strong>Email:</strong> privacy@aruviah.co.ke</p>
               <p><strong>Phone:</strong> +254 (Contact Number)</p>
               <p><strong>Data Protection Officer:</strong> Available upon request</p>
             </div>
@@ -216,7 +216,7 @@ const PrivacyPage = () => {
               <p><strong>Email:</strong> info@odpc.go.ke</p>
               <p><strong>Phone:</strong> +254 20 2675316</p>
             </div>
-            <p className="mt-4"><strong>To exercise your rights:</strong> Contact us at privacy@shopki.co.ke. We will respond within 30 days as required by law.</p>
+            <p className="mt-4"><strong>To exercise your rights:</strong> Contact us at privacy@aruviah.co.ke. We will respond within 30 days as required by law.</p>
           </section>
 
           <section>
@@ -258,8 +258,8 @@ const PrivacyPage = () => {
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">13. Children's Privacy</h2>
-            <p>Shopki is not intended for users under 18 years old. We do not knowingly collect personal data from children. If we discover that a child's data has been collected, we will delete it immediately.</p>
-            <p className="mt-4">Parents or guardians who believe their child's data has been collected should contact us at privacy@shopki.co.ke.</p>
+            <p>Aruviah is not intended for users under 18 years old. We do not knowingly collect personal data from children. If we discover that a child's data has been collected, we will delete it immediately.</p>
+            <p className="mt-4">Parents or guardians who believe their child's data has been collected should contact us at privacy@aruviah.co.ke.</p>
           </section>
 
           <section>
@@ -273,7 +273,7 @@ const PrivacyPage = () => {
             <ul className="list-disc list-inside space-y-2 mt-3 ml-4">
               <li>Clicking the "Unsubscribe" link in emails</li>
               <li>Adjusting settings in your account</li>
-              <li>Contacting us at privacy@shopki.co.ke</li>
+              <li>Contacting us at privacy@aruviah.co.ke</li>
             </ul>
             <p className="mt-4"><strong>Note:</strong> You will still receive transactional emails (e.g., order confirmations, security alerts) even if you opt out of marketing.</p>
           </section>
@@ -300,8 +300,8 @@ const PrivacyPage = () => {
             <p>If you have questions, concerns, or requests regarding this Privacy Policy or your personal data, please contact us:</p>
             
             <div className="bg-gray-100 p-4 rounded mt-4 space-y-2">
-              <p className="font-semibold">Shopki Privacy Team</p>
-              <p><strong>Email:</strong> privacy@shopki.co.ke</p>
+              <p className="font-semibold">Aruviah Privacy Team</p>
+              <p><strong>Email:</strong> privacy@aruviah.co.ke</p>
               <p><strong>Phone:</strong> +254 (Contact Number)</p>
               <p><strong>Address:</strong> Nairobi, Kenya</p>
             </div>
@@ -328,7 +328,7 @@ const PrivacyPage = () => {
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">18. Consent</h2>
-            <p>By using Shopki, you acknowledge that you have read, understood, and agree to this Privacy Policy.</p>
+            <p>By using Aruviah, you acknowledge that you have read, understood, and agree to this Privacy Policy.</p>
             <p className="mt-4">For sensitive processing (e.g., ID numbers, payment data), we will obtain your explicit consent where required by law.</p>
           </section>
 

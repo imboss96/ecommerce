@@ -7,9 +7,9 @@ import {
   FiHeart
 } from 'react-icons/fi';
 import { getProducts, getCategories } from '../services/firebase/firestoreHelpers';
-import { subscribeToNewsletter, sendNewsletterWelcomeEmail } from '../services/email/brevoService';
 import ProductCard from '../components/products/ProductCard/ProductCard';
 import SkeletonCard from '../components/common/Loader/Skeleton';
+import Newsletter from '../components/home/Newsletter/Newsletter';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotifications } from '../context/NotificationContext';
@@ -206,7 +206,7 @@ const Home = () => {
         <section className="cta py-12 bg-white">
           <div className="container mx-auto px-4">
             <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl p-8 md:p-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Join Shopki Today!</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Join Aruviah Today!</h2>
               <p className="text-lg md:text-xl mb-6 text-orange-50">
                 Create an account to unlock exclusive deals, faster checkout, and personalized recommendations
               </p>
@@ -222,35 +222,7 @@ const Home = () => {
       )}
 
       {/* Newsletter Section */}
-      <section className="newsletter py-8 bg-gray-900 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">Stay Updated with Our Newsletter</h2>
-            <p className="text-gray-300 mb-6">Get the latest updates on new products, exclusive deals, and special offers!</p>
-            <form className="flex flex-col sm:flex-row gap-3" onSubmit={(e) => {
-              e.preventDefault();
-              addNotification({
-                type: 'info',
-                title: 'Newsletter',
-                message: 'Newsletter subscription coming soon!',
-              });
-            }}>
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="flex-1 px-4 py-3 rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-900"
-                required
-              />
-              <button
-                type="submit"
-                className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition font-semibold whitespace-nowrap"
-              >
-                Subscribe Now
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
+      <Newsletter variant="full" />
 
       {/* Auth Modal */}
       <AuthModal

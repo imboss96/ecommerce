@@ -83,7 +83,7 @@ export const sendTransactionalEmail = async ({
   email,
   subject,
   htmlContent,
-  senderName = 'Shopki',
+  senderName = 'Aruviah',
   senderEmail = process.env.REACT_APP_BREVO_SENDER_EMAIL
 }) => {
   try {
@@ -125,12 +125,22 @@ export const sendTransactionalEmail = async ({
  */
 export const subscribeToNewsletter = async ({ email, firstName = '', lastName = '' }) => {
   try {
+    // Validate newsletter list ID
+    const listId = process.env.REACT_APP_BREVO_NEWSLETTER_LIST_ID;
+    if (!listId || isNaN(parseInt(listId))) {
+      console.error('❌ REACT_APP_BREVO_NEWSLETTER_LIST_ID is not properly configured. Set it in your .env file.');
+      return { 
+        success: false, 
+        error: 'Newsletter list ID is not configured. Please contact support.' 
+      };
+    }
+
     const brevoClient = getBrevClient();
     const response = await brevoClient.post('/contacts', {
       email,
       firstName,
       lastName,
-      listIds: [parseInt(process.env.REACT_APP_BREVO_NEWSLETTER_LIST_ID)],
+      listIds: [parseInt(listId)],
       updateEnabled: true
     });
     
@@ -236,7 +246,7 @@ export const sendOrderConfirmationEmail = async (email, orderData) => {
               </div>
               
               <div class="content">
-                <p style="font-size: 16px; color: #555;">Thank you for shopping with <strong>Shopki</strong>! We're excited to get your order ready.</p>
+                <p style="font-size: 16px; color: #555;">Thank you for shopping with <strong>Aruviah</strong>! We're excited to get your order ready.</p>
                 
                 <div class="order-info">
                   <div class="order-info-grid">
@@ -300,12 +310,12 @@ export const sendOrderConfirmationEmail = async (email, orderData) => {
                 <hr class="divider">
                 
                 <p style="font-size: 14px; color: #888; text-align: center;">
-                  Thank you for being part of the Shopki family! Happy shopping! 🛍️
+                  Thank you for being part of the Aruviah family! Happy shopping! 🛍️
                 </p>
               </div>
               
               <div class="footer">
-                <p style="margin: 10px 0;">© 2025 Shopki. All rights reserved.</p>
+                <p style="margin: 10px 0;">© 2025 Aruviah. All rights reserved.</p>
                 <p style="margin: 10px 0; font-size: 11px;">This is an automated order confirmation. Please do not reply to this email.</p>
                 <p style="margin: 10px 0;"><a href="${process.env.REACT_APP_BASE_URL}/privacy" style="color: #ff9800; text-decoration: none;">Privacy Policy</a> | <a href="${process.env.REACT_APP_BASE_URL}/terms" style="color: #ff9800; text-decoration: none;">Terms & Conditions</a></p>
               </div>
@@ -317,7 +327,7 @@ export const sendOrderConfirmationEmail = async (email, orderData) => {
 
     return sendTransactionalEmail({
       email,
-      subject: `✅ Order Confirmed - Shopki Order #${orderData.id.slice(0, 8).toUpperCase()}`,
+      subject: `✅ Order Confirmed - Aruviah Order #${orderData.id.slice(0, 8).toUpperCase()}`,
       htmlContent
     });
   } catch (error) {
@@ -334,11 +344,28 @@ export const sendOrderConfirmationEmail = async (email, orderData) => {
  */
 export const sendOrderStatusEmail = async (email, orderData) => {
   try {
-    // Fetch the 'orderStatus' email template from admin settings
-    const template = await getEmailTemplate('orderStatus');
+    // Map status to specific template, or use generic orderStatus template
+    const statusTemplateMap = {
+      pending: 'orderPending',
+      confirmed: 'orderConfirmed',
+      processing: 'orderProcessing',
+      shipped: 'orderShipped',
+      completed: 'orderCompleted',
+      cancelled: 'orderCancelled',
+      returned: 'orderReturned'
+    };
+    
+    const templateType = statusTemplateMap[orderData.status] || 'orderStatus';
+    
+    // Try to fetch status-specific template, fallback to generic orderStatus
+    let template = await getEmailTemplate(templateType);
+    if (!template || !template.htmlContent) {
+      template = await getEmailTemplate('orderStatus');
+    }
     
     const statusMessages = {
       pending: 'Your order has been received and is being prepared.',
+      confirmed: 'Your order has been confirmed by the vendor and will be processed soon.',
       processing: 'Your order is being processed and will be shipped soon.',
       shipped: 'Your order has been shipped! Track your package with the tracking number below.',
       completed: 'Your order has been delivered. We hope you enjoy your purchase!',
@@ -435,13 +462,13 @@ export const sendWelcomeEmail = async (email, firstName = 'Valued Customer') => 
         <div class="container">
           <div class="header">
             <img src="data:image/png;base64,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
-" alt="Shopki Logo" class="logo">
-            <h1>Welcome to Shopki! 🎉</h1>
+" alt="Aruviah Logo" class="logo">
+            <h1>Welcome to Aruviah! 🎉</h1>
           </div>
           
           <div class="content">
             <p class="greeting">Hello <strong>${firstName}</strong>,</p>
-            <p>Thank you for joining <strong>Shopki</strong>! We're thrilled to welcome you to our community of smart shoppers. Get ready to discover amazing products at incredible prices.</p>
+            <p>Thank you for joining <strong>Aruviah</strong>! We're thrilled to welcome you to our community of smart shoppers. Get ready to discover amazing products at incredible prices.</p>
             
             <div class="highlight-box">
               <p>🎁 Exclusive New Member Offer: Enjoy special discounts on your first purchase! Check your dashboard for your personalized welcome offer.</p>
@@ -497,7 +524,7 @@ export const sendWelcomeEmail = async (email, firstName = 'Valued Customer') => 
             <ul class="benefits">
               <li><a href="${process.env.REACT_APP_BASE_URL}/faq" style="color: #ff9800; text-decoration: none;">Frequently Asked Questions</a></li>
               <li><a href="${process.env.REACT_APP_BASE_URL}/contact" style="color: #ff9800; text-decoration: none;">Contact Us</a></li>
-              <li>Email: support@shopki.com</li>
+              <li>Email: support@aruviah.com</li>
             </ul>
             
             <div style="text-align: center; margin: 30px 0;">
@@ -512,9 +539,9 @@ export const sendWelcomeEmail = async (email, firstName = 'Valued Customer') => 
           </div>
           
           <div class="footer">
-            <p style="margin: 10px 0;"><strong>Shopki - Your Trusted Online Marketplace</strong></p>
-            <p style="margin: 10px 0; font-size: 11px;">© 2025 Shopki. All rights reserved.</p>
-            <p style="margin: 10px 0; font-size: 11px;">You're receiving this email because you created an account with Shopki.</p>
+            <p style="margin: 10px 0;"><strong>Aruviah - Your Trusted Online Marketplace</strong></p>
+            <p style="margin: 10px 0; font-size: 11px;">© 2025 Aruviah. All rights reserved.</p>
+            <p style="margin: 10px 0; font-size: 11px;">You're receiving this email because you created an account with Aruviah.</p>
             <p style="margin: 10px 0;"><a href="${process.env.REACT_APP_BASE_URL}/privacy">Privacy Policy</a> | <a href="${process.env.REACT_APP_BASE_URL}/terms">Terms & Conditions</a></p>
           </div>
         </div>
@@ -524,7 +551,7 @@ export const sendWelcomeEmail = async (email, firstName = 'Valued Customer') => 
 
   return sendTransactionalEmail({
     email,
-    subject: `Welcome to Shopki, ${firstName}! 🎉 Start Shopping Today`,
+    subject: `Welcome to Aruviah, ${firstName}! 🎉 Start Shopping Today`,
     htmlContent
   });
 };
@@ -555,6 +582,48 @@ export const sendPasswordResetEmail = async (email, resetLink) => {
   }
 };
 
+/**
+ * Fetch newsletter subscribers from a specific list
+ * @param {number} listId - Brevo list ID (optional, defaults to newsletter list)
+ * @param {number} limit - Number of subscribers to fetch (default: 500)
+ * @param {number} offset - Pagination offset (default: 0)
+ * @returns {Promise}
+ */
+export const getNewsletterSubscribers = async (listId = null, limit = 500, offset = 0) => {
+  try {
+    const id = listId || parseInt(process.env.REACT_APP_BREVO_NEWSLETTER_LIST_ID);
+    if (!id || isNaN(id)) {
+      console.error('❌ Newsletter list ID is not configured');
+      return { success: false, error: 'Newsletter list ID not configured', contacts: [] };
+    }
+
+    const brevoClient = getBrevClient();
+    const response = await brevoClient.get(`/contacts/lists/${id}/contacts`, {
+      params: {
+        limit,
+        offset,
+        sort: 'desc'
+      }
+    });
+
+    console.log(`✅ Fetched ${response.data.contacts?.length || 0} newsletter subscribers`);
+    
+    return { 
+      success: true, 
+      contacts: response.data.contacts || [],
+      totalCount: response.data.count || 0,
+      totalPages: Math.ceil((response.data.count || 0) / limit)
+    };
+  } catch (error) {
+    console.error('❌ Error fetching newsletter subscribers:', error.response?.data || error.message);
+    return { 
+      success: false, 
+      error: error.response?.data?.message || error.message,
+      contacts: []
+    };
+  }
+};
+
 export default {
   sendTransactionalEmail,
   subscribeToNewsletter,
@@ -564,5 +633,6 @@ export default {
   sendWelcomeEmail,
   getEmailTemplate,
   replaceTemplateVariables,
-  getLogoUrl
+  getLogoUrl,
+  getNewsletterSubscribers
 };

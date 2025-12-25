@@ -75,8 +75,8 @@ const CheckoutPage = () => {
         phoneNumber,
         amount: total,
         orderId,
-        accountReference: `SHOPKI-${orderId}`,
-        description: `Shopki Order #${orderId}`
+        accountReference: `ARUVIAH-${orderId}`,
+        description: `Aruviah Order #${orderId}`
       };
 
       const validation = validateMpesaPaymentData(paymentData);
@@ -138,6 +138,8 @@ const CheckoutPage = () => {
         userId: user.uid,
         userEmail: user.email,
         userName: user.displayName || 'Customer',
+        userPhone: shippingInfo.phone,
+        invoiceNumber: `INV-${Date.now()}-${user.uid.slice(0, 8).toUpperCase()}`,
         items: cartItems,
         shippingInfo,
         paymentMethod,

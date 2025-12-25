@@ -13,8 +13,8 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
  * @param {Object} paymentData - Payment information
  * @param {string} paymentData.phoneNumber - Customer phone number (format: 254712345678)
  * @param {number} paymentData.amount - Amount in KES
- * @param {string} paymentData.orderId - Shopki order ID
- * @param {string} paymentData.accountReference - Account reference (e.g., "SHOPKI-ORDER-123")
+ * @param {string} paymentData.orderId - Aruviah order ID
+ * @param {string} paymentData.accountReference - Account reference (e.g., "ARUVIAH-ORDER-123")
  * @param {string} paymentData.description - Transaction description
  * @returns {Promise<Object>} Response with checkout request ID and status
  */
@@ -26,8 +26,8 @@ export const initiateMpesaPayment = async (paymentData) => {
         phoneNumber: paymentData.phoneNumber,
         amount: paymentData.amount,
         orderId: paymentData.orderId,
-        accountReference: paymentData.accountReference || `SHOPKI-${paymentData.orderId}`,
-        description: paymentData.description || 'Shopki Order Payment'
+        accountReference: paymentData.accountReference || `ARUVIAH-${paymentData.orderId}`,
+        description: paymentData.description || 'Aruviah Order Payment'
       },
       {
         headers: {

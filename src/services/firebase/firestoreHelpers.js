@@ -307,18 +307,110 @@ export const addReview = async (productId, reviewData) => {
 
 /**
  * Create a new order
+ * Validates stock before creating order, supports multiple vendors
  */
 export const createOrder = async (orderData) => {
   try {
-    const docRef = await addDoc(collection(db, 'orders'), {
+    // Step 1: Validate stock for ALL items before creating order
+    console.log('🔍 Validating stock for all items...');
+    
+    const vendorIds = new Set(); // Support multiple vendors
+    const stockValidation = {};
+    
+    if (orderData.items && Array.isArray(orderData.items)) {
+      for (const item of orderData.items) {
+        const productId = item.productId || item.id;
+        const quantity = item.quantity || 1;
+        
+        if (productId) {
+          try {
+            const productRef = doc(db, 'products', productId);
+            const productSnap = await getDoc(productRef);
+            
+            if (productSnap.exists()) {
+              const productData = productSnap.data();
+              const currentStock = productData.stock || 0;
+              
+              // Check if sufficient stock available
+              if (currentStock < quantity) {
+                console.error(`❌ Insufficient stock for product ${productId}: requested ${quantity}, available ${currentStock}`);
+                return { 
+                  orderId: null, 
+                  error: `Insufficient stock for ${item.name || 'item'}. Available: ${currentStock}, Requested: ${quantity}` 
+                };
+              }
+              
+              // Store validation data for later use
+              stockValidation[productId] = {
+                productData,
+                currentStock,
+                quantity,
+                vendorId: productData.vendorId
+              };
+              
+              // Collect vendor IDs
+              if (productData.vendorId) {
+                vendorIds.add(productData.vendorId);
+              }
+              
+              console.log(`✅ Stock validated for product ${productId}: ${currentStock} >= ${quantity}`);
+            } else {
+              return { orderId: null, error: `Product ${productId} not found` };
+            }
+          } catch (err) {
+            console.error(`❌ Error validating stock for product ${productId}:`, err.message);
+            return { orderId: null, error: `Error validating product ${productId}` };
+          }
+        }
+      }
+    }
+    
+    // Step 2: Create main order document with all vendor IDs
+    const vendorIdArray = Array.from(vendorIds);
+    
+    const orderDoc = {
       ...orderData,
       status: 'pending',
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
+      updatedAt: serverTimestamp(),
+      vendorIds: vendorIdArray, // Store ALL vendors for this order
+      vendorId: vendorIdArray.length === 1 ? vendorIdArray[0] : null // Keep single vendorId for backward compatibility
+    };
     
-    console.log('✅ Order created:', docRef.id);
-    return { orderId: docRef.id, error: null };
+    const docRef = await addDoc(collection(db, 'orders'), orderDoc);
+    const orderId = docRef.id;
+    
+    console.log(`✅ Order created: ${orderId}`);
+    console.log(`📌 Order linked to vendors:`, vendorIdArray);
+    
+    // Step 3: Update stock for all items (now safe since we validated)
+    console.log('📦 Updating product stock...');
+    
+    for (const item of orderData.items) {
+      const productId = item.productId || item.id;
+      const quantity = item.quantity || 1;
+      
+      if (productId && stockValidation[productId]) {
+        try {
+          const validation = stockValidation[productId];
+          const newStock = Math.max(0, validation.currentStock - quantity);
+          const productRef = doc(db, 'products', productId);
+          
+          await updateDoc(productRef, {
+            stock: newStock,
+            sold: (validation.productData.sold || 0) + quantity,
+            updatedAt: serverTimestamp()
+          });
+          
+          console.log(`📦 Updated stock for product ${productId}: ${validation.currentStock} → ${newStock}`);
+          console.log(`📊 Updated sold count for product ${productId}: ${(validation.productData.sold || 0)} → ${(validation.productData.sold || 0) + quantity}`);
+        } catch (err) {
+          console.warn(`⚠️ Could not update stock for product ${productId}:`, err.message);
+        }
+      }
+    }
+    
+    return { orderId, error: null };
     
   } catch (error) {
     console.error('❌ Error creating order:', error);
@@ -389,10 +481,13 @@ export const getOrderById = async (orderId) => {
 
 /**
  * Update order status
+ * @param {string} orderId - Order ID
+ * @param {string} status - New status
+ * @param {string} vendorId - Optional vendor ID for permission check
  */
-export const updateOrderStatus = async (orderId, status) => {
+export const updateOrderStatus = async (orderId, status, vendorId = null) => {
   try {
-    console.log(`📝 Updating order ${orderId} status to: ${status}`);
+    console.log(`📝 Updating order ${orderId} status to: ${status}${vendorId ? ` (vendor: ${vendorId})` : ' (admin/user)'}`);
     
     const docRef = doc(db, 'orders', orderId);
     
@@ -405,6 +500,12 @@ export const updateOrderStatus = async (orderId, status) => {
     
     let orderData = orderSnap.data();
     console.log('✅ Order found:', { userEmail: orderData.userEmail, userName: orderData.userName });
+    
+    // If vendorId is provided, verify vendor ownership
+    if (vendorId && orderData.vendorId && orderData.vendorId !== vendorId) {
+      console.error('❌ Unauthorized: Vendor does not own this order');
+      return { success: false, error: 'Unauthorized: This is not your order' };
+    }
     
     // If email is not in order, fetch from user document
     if (!orderData.userEmail && orderData.userId) {

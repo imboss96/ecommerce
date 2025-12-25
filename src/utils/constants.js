@@ -1,7 +1,7 @@
 // Location: src/utils/constants.js
 
 // App Configuration
-export const APP_NAME = 'Shopki';
+export const APP_NAME = 'Aruviah';
 export const APP_DESCRIPTION = 'Your one-stop shop for quality products';
 export const APP_VERSION = '1.0.0';
 
@@ -171,15 +171,15 @@ export const API_ENDPOINTS = {
 
 // Social Media Links
 export const SOCIAL_LINKS = {
-  FACEBOOK: 'https://facebook.com/shopki',
-  TWITTER: 'https://twitter.com/shopki',
-  INSTAGRAM: 'https://instagram.com/shopki',
-  LINKEDIN: 'https://linkedin.com/company/shopki'
+  FACEBOOK: 'https://facebook.com/aruviah',
+  TWITTER: 'https://twitter.com/aruviah',
+  INSTAGRAM: 'https://instagram.com/aruviah',
+  LINKEDIN: 'https://linkedin.com/company/aruviah'
 };
 
 // Contact Information
 export const CONTACT_INFO = {
-  EMAIL: 'support@shopki.com',
+  EMAIL: 'support@aruviah.com',
   PHONE: '+254 700 000 000',
   ADDRESS: 'Nairobi, Kenya',
   SUPPORT_HOURS: 'Mon-Fri: 9:00 AM - 6:00 PM'
@@ -205,11 +205,11 @@ export const TOAST_CONFIG = {
 
 // Local Storage Keys
 export const STORAGE_KEYS = {
-  CART: 'shopki_cart',
-  WISHLIST: 'shopki_wishlist',
-  USER: 'shopki_user',
-  THEME: 'shopki_theme',
-  RECENT_SEARCHES: 'shopki_recent_searches'
+  CART: 'aruviah_cart',
+  WISHLIST: 'aruviah_wishlist',
+  USER: 'aruviah_user',
+  THEME: 'aruviah_theme',
+  RECENT_SEARCHES: 'aruviah_recent_searches'
 };
 
 // Error Messages

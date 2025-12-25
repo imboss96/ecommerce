@@ -11,11 +11,18 @@ import {
   signInWithPopup,
   sendEmailVerification
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 // Import the already initialized Firebase instances
 import { auth, db } from '../services/firebase/config';
 // Import email automation
 import { sendAccountConfirmationEmail } from '../services/email/emailAutomation';
+// Import phone auth functions
+import { 
+  sendPhoneOTP,
+  verifyPhoneOTP,
+  completePhoneSignup,
+  formatPhoneNumber
+} from '../services/firebase/phoneAuth';
 
 const AuthContext = createContext();
 
@@ -33,21 +40,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Fetch user data from Firestore
-  const fetchUserData = async (uid) => {
-    try {
-      const userDocRef = doc(db, 'users', uid);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (userDoc.exists()) {
-        setUserData(userDoc.data());
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
-
-  // Monitor auth state changes
+  // Monitor auth state changes with real-time Firestore updates
   useEffect(() => {
     console.log('AuthProvider: Setting up auth listener');
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -56,12 +49,29 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(!!currentUser);
       
       if (currentUser) {
-        await fetchUserData(currentUser.uid);
+        // Set up real-time listener for user data
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const unsubscribeSnapshot = onSnapshot(userDocRef, (userDoc) => {
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            console.log('User data updated:', data.email, { isVendor: data.isVendor });
+            setUserData(data);
+          } else {
+            console.log('User document does not exist');
+            setUserData(null);
+          }
+        }, (error) => {
+          console.error('Error listening to user data:', error);
+        });
+        
+        setLoading(false);
+        
+        // Return cleanup function for the snapshot listener
+        return unsubscribeSnapshot;
       } else {
         setUserData(null);
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return unsubscribe;
@@ -147,7 +157,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      await fetchUserData(userCredential.user.uid);
       return { success: true, user: userCredential.user };
     } catch (error) {
       console.error('Login error:', error);
@@ -210,8 +219,6 @@ export const AuthProvider = ({ children }) => {
         } catch (emailError) {
           console.error('⚠️ Email service error:', emailError);
         }
-      } else {
-        await fetchUserData(user.uid);
       }
 
       return { success: true, user };
@@ -235,6 +242,50 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Send OTP to phone number
+  const sendPhoneVerificationOTP = async (phoneNumber) => {
+    try {
+      const formattedPhone = formatPhoneNumber(phoneNumber);
+      console.log('📱 Sending OTP to:', formattedPhone);
+      const confirmationResult = await sendPhoneOTP(formattedPhone);
+      return { success: true, confirmationResult };
+    } catch (error) {
+      console.error('Error sending phone OTP:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  // Verify OTP and complete phone authentication
+  const verifyPhoneCode = async (confirmationResult, otp, displayName) => {
+    try {
+      console.log('🔐 Verifying phone code...');
+      const user = await verifyPhoneOTP(confirmationResult, otp);
+      
+      // Complete signup - create user profile
+      const userData = await completePhoneSignup(user, displayName);
+      
+      // Update local state
+      setUser(user);
+      setUserData(userData);
+      setIsAuthenticated(true);
+      
+      // Send welcome SMS/email if available
+      try {
+        if (user.email) {
+          await sendAccountConfirmationEmail(user.email, displayName);
+          console.log('✅ Welcome email sent');
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not send welcome message:', error.message);
+      }
+
+      return { success: true, user, userData };
+    } catch (error) {
+      console.error('Error verifying phone code:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
   const value = {
     user,
     userData,
@@ -245,7 +296,8 @@ export const AuthProvider = ({ children }) => {
     login,
     loginWithGoogle,
     logout,
-    fetchUserData
+    sendPhoneVerificationOTP,
+    verifyPhoneCode
   };
 
   console.log('AuthProvider: Rendering, loading =', loading);

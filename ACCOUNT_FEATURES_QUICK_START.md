@@ -2,7 +2,7 @@
 
 ## 🎯 What's New
 
-Your Shopki e-commerce application now has a complete account management system with:
+Your Aruviah e-commerce application now has a complete account management system with:
 
 1. **Account Information** - Edit profile details, address, phone number
 2. **Password Management** - Secure password change with strength indicator

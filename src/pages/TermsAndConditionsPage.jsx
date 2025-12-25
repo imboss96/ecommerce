@@ -7,7 +7,7 @@ export const TermsAndConditionsPage = () => {
   const sections = [
     {
       title: '1. INTRODUCTION',
-      content: 'Welcome to Shopki ("we," "us," or "our"). These Terms and Conditions ("Terms") govern your access to and use of the Shopki e-commerce platform, website, and mobile applications (collectively, the "Platform") operating in Kenya and the East African Community.\n\nBy accessing or using Shopki, you agree to be bound by these Terms. If you do not agree, please discontinue use immediately.'
+      content: 'Welcome to Aruviah ("we," "us," or "our"). These Terms and Conditions ("Terms") govern your access to and use of the Aruviah e-commerce platform, website, and mobile applications (collectively, the "Platform") operating in Kenya and the East African Community.\n\nBy accessing or using Aruviah, you agree to be bound by these Terms. If you do not agree, please discontinue use immediately.'
     },
     {
       title: '2. DEFINITIONS',
@@ -15,11 +15,11 @@ export const TermsAndConditionsPage = () => {
     },
     {
       title: '3. ELIGIBILITY',
-      content: '3.1. You must be at least 18 years old to use Shopki.\n\n3.2. You must be a resident of Kenya or an East African Community member state (Kenya, Uganda, Tanzania, Rwanda, Burundi, South Sudan, or Democratic Republic of Congo).\n\n3.3. By registering, you represent that all information provided is accurate and complete.\n\n3.4. We reserve the right to verify your identity and suspend accounts that violate these terms.'
+      content: '3.1. You must be at least 18 years old to use Aruviah.\n\n3.2. You must be a resident of Kenya or an East African Community member state (Kenya, Uganda, Tanzania, Rwanda, Burundi, South Sudan, or Democratic Republic of Congo).\n\n3.3. By registering, you represent that all information provided is accurate and complete.\n\n3.4. We reserve the right to verify your identity and suspend accounts that violate these terms.'
     },
     {
       title: '4. ACCOUNT REGISTRATION',
-      content: '4.1. You must create an account to access certain features.\n\n4.2. You are responsible for maintaining the confidentiality of your login credentials.\n\n4.3. You agree to notify us immediately of any unauthorized access to your account.\n\n4.4. One person or business may maintain only one account unless authorized by Shopki.'
+      content: '4.1. You must create an account to access certain features.\n\n4.2. You are responsible for maintaining the confidentiality of your login credentials.\n\n4.3. You agree to notify us immediately of any unauthorized access to your account.\n\n4.4. One person or business may maintain only one account unless authorized by Aruviah.'
     },
     {
       title: '5. USER CONDUCT',
@@ -35,11 +35,11 @@ export const TermsAndConditionsPage = () => {
     },
     {
       title: '8. PAYMENTS AND FEES',
-      content: '8.1. Payment Methods: We accept M-Pesa, bank transfers, credit/debit cards, and other approved methods.\n\n8.2. Currency: Transactions are primarily conducted in Kenyan Shillings (KES) but may support other EAC currencies.\n\n8.3. Seller Fees: Shopki charges a commission on each sale plus applicable payment processing fees.\n\n8.4. Taxes: Sellers are responsible for VAT and other applicable taxes as per Kenyan Tax Laws.\n\n8.5. Payment Processing: Payments are held in escrow and released to Sellers upon successful delivery or after the return period expires.'
+      content: '8.1. Payment Methods: We accept M-Pesa, bank transfers, credit/debit cards, and other approved methods.\n\n8.2. Currency: Transactions are primarily conducted in Kenyan Shillings (KES) but may support other EAC currencies.\n\n8.3. Seller Fees: Aruviah charges a commission on each sale plus applicable payment processing fees.\n\n8.4. Taxes: Sellers are responsible for VAT and other applicable taxes as per Kenyan Tax Laws.\n\n8.5. Payment Processing: Payments are held in escrow and released to Sellers upon successful delivery or after the return period expires.'
     },
     {
       title: '9. SHIPPING AND DELIVERY',
-      content: '9.1. Delivery times and costs vary by location within Kenya and East Africa.\n\n9.2. Sellers are responsible for packaging and shipping products securely.\n\n9.3. Shopki partners with third-party logistics providers but is not liable for shipping delays beyond our control.\n\n9.4. Risk of loss passes to the Buyer upon delivery.'
+      content: '9.1. Delivery times and costs vary by location within Kenya and East Africa.\n\n9.2. Sellers are responsible for packaging and shipping products securely.\n\n9.3. Aruviah partners with third-party logistics providers but is not liable for shipping delays beyond our control.\n\n9.4. Risk of loss passes to the Buyer upon delivery.'
     },
     {
       title: '10. RETURNS AND REFUNDS',
@@ -47,7 +47,7 @@ export const TermsAndConditionsPage = () => {
     },
     {
       title: '11. INTELLECTUAL PROPERTY',
-      content: '11.1. Shopki owns all rights to the Platform\'s design, logo, and content.\n\n11.2. Users retain ownership of content they upload but grant Shopki a license to use it for Platform operations.\n\n11.3. Users must not infringe on trademarks, copyrights, or patents of third parties.'
+      content: '11.1. Aruviah owns all rights to the Platform\'s design, logo, and content.\n\n11.2. Users retain ownership of content they upload but grant Aruviah a license to use it for Platform operations.\n\n11.3. Users must not infringe on trademarks, copyrights, or patents of third parties.'
     },
     {
       title: '12. PRIVACY AND DATA PROTECTION',
@@ -55,15 +55,15 @@ export const TermsAndConditionsPage = () => {
     },
     {
       title: '13. DISPUTE RESOLUTION',
-      content: '13.1. Negotiation: Users should first attempt to resolve disputes through direct communication.\n\n13.2. Mediation: Unresolved disputes may be mediated by Shopki\'s customer support team.\n\n13.3. Arbitration: If mediation fails, disputes shall be resolved through arbitration in Nairobi, Kenya, under the Arbitration Act (Cap 49).\n\n13.4. Governing Law: These Terms are governed by the Laws of Kenya.'
+      content: '13.1. Negotiation: Users should first attempt to resolve disputes through direct communication.\n\n13.2. Mediation: Unresolved disputes may be mediated by Aruviah\'s customer support team.\n\n13.3. Arbitration: If mediation fails, disputes shall be resolved through arbitration in Nairobi, Kenya, under the Arbitration Act (Cap 49).\n\n13.4. Governing Law: These Terms are governed by the Laws of Kenya.'
     },
     {
       title: '14. LIMITATION OF LIABILITY',
-      content: '14.1. Shopki acts as a marketplace platform connecting Buyers and Sellers.\n\n14.2. We are not responsible for the quality, safety, or legality of products listed.\n\n14.3. We are not liable for disputes between Buyers and Sellers.\n\n14.4. Our total liability shall not exceed the fees paid by you in the last 12 months.\n\n14.5. We are not liable for loss of profits, data, or indirect damages.'
+      content: '14.1. Aruviah acts as a marketplace platform connecting Buyers and Sellers.\n\n14.2. We are not responsible for the quality, safety, or legality of products listed.\n\n14.3. We are not liable for disputes between Buyers and Sellers.\n\n14.4. Our total liability shall not exceed the fees paid by you in the last 12 months.\n\n14.5. We are not liable for loss of profits, data, or indirect damages.'
     },
     {
       title: '15. INDEMNIFICATION',
-      content: 'You agree to indemnify and hold harmless Shopki, its officers, employees, and partners from any claims, damages, or losses arising from:\n\n• Your violation of these Terms\n• Your violation of any laws\n• Your infringement of third-party rights\n• Your use of the Platform'
+      content: 'You agree to indemnify and hold harmless Aruviah, its officers, employees, and partners from any claims, damages, or losses arising from:\n\n• Your violation of these Terms\n• Your violation of any laws\n• Your infringement of third-party rights\n• Your use of the Platform'
     },
     {
       title: '16. TERMINATION',
@@ -127,7 +127,7 @@ export const TermsAndConditionsPage = () => {
               {/* Introduction Alert */}
               <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8">
                 <p className="text-blue-800">
-                  <strong>Important:</strong> Please read these Terms and Conditions carefully before using Shopki. By accessing or using the platform, you agree to be bound by all the terms outlined below.
+                  <strong>Important:</strong> Please read these Terms and Conditions carefully before using Aruviah. By accessing or using the platform, you agree to be bound by all the terms outlined below.
                 </p>
               </div>
 
@@ -157,8 +157,8 @@ export const TermsAndConditionsPage = () => {
                       <h4 className="font-semibold text-gray-900">Email</h4>
                     </div>
                     <p className="text-gray-700">
-                      <a href="mailto:support@shopki.co.ke" className="text-orange-600 hover:underline">
-                        support@shopki.co.ke
+                      <a href="mailto:support@aruviah.co.ke" className="text-orange-600 hover:underline">
+                        support@aruviah.co.ke
                       </a>
                     </p>
                   </div>
@@ -177,7 +177,7 @@ export const TermsAndConditionsPage = () => {
                       <h4 className="font-semibold text-gray-900">Address</h4>
                     </div>
                     <p className="text-gray-700">
-                      Shopki Headquarters<br />
+                      Aruviah Headquarters<br />
                       Nairobi, Kenya
                     </p>
                   </div>

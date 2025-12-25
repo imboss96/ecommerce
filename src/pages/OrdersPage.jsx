@@ -165,13 +165,19 @@ export const OrdersPage = () => {
                     </h3>
                     <p className="text-sm text-gray-500 mt-1">
                       {order.createdAt
-                        ? new Date(order.createdAt).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })
+                        ? (() => {
+                            const date = order.createdAt?.toDate?.() || new Date(order.createdAt);
+                            return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            });
+                          })()
                         : 'Date not available'}
                     </p>
+                    {order.invoiceNumber && (
+                      <p className="text-xs text-gray-400 mt-1">Invoice: {order.invoiceNumber}</p>
+                    )}
                   </div>
                   
                   {/* Status Badge */}
@@ -193,6 +199,22 @@ export const OrdersPage = () => {
                       {order.status?.charAt(0).toUpperCase() + order.status?.slice(1) || 'Pending'}
                     </span>
                   </div>
+                </div>
+
+                {/* Contact & Order Info */}
+                <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded">
+                  {order.userPhone && (
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase font-semibold">Phone</p>
+                      <p className="text-sm font-medium text-gray-900">{order.userPhone}</p>
+                    </div>
+                  )}
+                  {order.invoiceNumber && (
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase font-semibold">Invoice #</p>
+                      <p className="text-sm font-medium text-gray-900">{order.invoiceNumber}</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Order Items */}

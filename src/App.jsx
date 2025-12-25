@@ -35,6 +35,10 @@ import SeedDataPage from './pages/SeedDataPage';
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 
+// Vendor Pages
+import VendorSignupPage from './pages/VendorSignupPage';
+import VendorDashboard from './components/vendor/VendorDashboard/VendorDashboard';
+
 // Protected Route Component
 import ProtectedRoute from './routes/ProtectedRoute';
 import AdminRoute from './routes/AdminRoute';
@@ -89,10 +93,21 @@ function App() {
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/seed-data" element={<SeedDataPage />} />
+                <Route path="/vendor-signup" element={<VendorSignupPage />} />
 
                 {/* Checkout - Can be accessed by guests */}
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/order-success" element={<OrderSuccessPage />} />
+
+                {/* Vendor Routes - Require Authentication */}
+                <Route
+                  path="/vendor/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <VendorDashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Protected Routes - Require Authentication */}
                 <Route

@@ -25,6 +25,10 @@
   font-size: 14px;
   color: #666;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 .settings-tab:hover {

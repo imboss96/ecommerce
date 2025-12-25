@@ -1143,8 +1143,10 @@ const AdminDashboard = () => {
                   <thead>
                     <tr className="bg-gray-100 border-b">
                       <th className="text-left py-3 px-4">Order ID</th>
+                      <th className="text-left py-3 px-4">Invoice #</th>
                       <th className="text-left py-3 px-4">Customer</th>
                       <th className="text-left py-3 px-4">Email</th>
+                      <th className="text-left py-3 px-4">Phone</th>
                       <th className="text-left py-3 px-4">Date</th>
                       <th className="text-left py-3 px-4">Items</th>
                       <th className="text-left py-3 px-4">Total</th>
@@ -1156,8 +1158,10 @@ const AdminDashboard = () => {
                     {filteredOrders.map((order) => (
                       <tr key={order.id} className="border-b hover:bg-gray-50">
                         <td className="py-4 px-4 font-mono text-sm">{order.id.slice(0, 8).toUpperCase()}</td>
+                        <td className="py-4 px-4 font-mono text-xs text-gray-600">{order.invoiceNumber || 'N/A'}</td>
                         <td className="py-4 px-4">{order.userName || 'N/A'}</td>
                         <td className="py-4 px-4 text-sm">{order.userEmail || 'N/A'}</td>
+                        <td className="py-4 px-4 text-sm">{order.userPhone || 'N/A'}</td>
                         <td className="py-4 px-4 text-sm">
                           {order.createdAt
                             ? (() => {

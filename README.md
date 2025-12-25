@@ -1,4 +1,4 @@
-# Shopki - E-commerce Platform
+# Aruviah - E-commerce Platform
 
 A full-featured e-commerce platform built with React and Firebase.
 
